@@ -2,16 +2,24 @@
 
 import { useEffect, useState } from "react";
 
-// Схема задачи — «контракт» между интерфейсом и будущим AI (Фаза 3).
+// Схема задачи — «контракт» между интерфейсом и AI.
 export type Task = {
   id: string;
   title: string;
   done: boolean;
   createdAt: number;
-  // Эти поля пока не заполняются — их будет проставлять AI на Фазе 3:
+  // Эти поля проставляет AI (Фаза 3):
   priority?: "low" | "medium" | "high";
-  estimateMin?: number; // оценка времени в минутах
-  dueDate?: string; // дедлайн, ISO-строка
+  estimateMin?: number | null; // оценка времени в минутах
+  dueDate?: string | null; // дедлайн, YYYY-MM-DD
+};
+
+// То, что возвращает сервер после разбора текста через Claude.
+export type ParsedTask = {
+  title: string;
+  priority: "low" | "medium" | "high";
+  estimateMin: number | null;
+  dueDate: string | null;
 };
 
 const STORAGE_KEY = "day-planner:tasks";
@@ -36,20 +44,18 @@ export function useTasks() {
     if (loaded) localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
   }, [tasks, loaded]);
 
-  // Разбираем текст: каждая непустая строка → отдельная задача
-  function addFromText(text: string): number {
-    const titles = text
-      .split("\n")
-      .map((t) => t.trim())
-      .filter(Boolean);
-    if (titles.length === 0) return 0;
-
+  // Добавляем задачи, разобранные AI на сервере
+  function addParsed(parsed: ParsedTask[]): number {
+    if (parsed.length === 0) return 0;
     const now = Date.now();
-    const created: Task[] = titles.map((title, i) => ({
+    const created: Task[] = parsed.map((p, i) => ({
       id: `${now}-${i}`,
-      title,
+      title: p.title,
       done: false,
       createdAt: now,
+      priority: p.priority,
+      estimateMin: p.estimateMin,
+      dueDate: p.dueDate,
     }));
     setTasks((prev) => [...created, ...prev]);
     return created.length;
@@ -65,5 +71,5 @@ export function useTasks() {
     setTasks((prev) => prev.filter((t) => t.id !== id));
   }
 
-  return { tasks, addFromText, toggle, remove, loaded };
+  return { tasks, addParsed, toggle, remove, loaded };
 }

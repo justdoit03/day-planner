@@ -9,11 +9,24 @@ import { useTasks } from "./lib/useTasks";
 
 export default function Home() {
   const [tab, setTab] = useState<TabKey>("capture");
-  const { tasks, addFromText, toggle, remove } = useTasks();
+  const { tasks, addParsed, toggle, remove } = useTasks();
 
-  function handleCapture(text: string) {
-    const added = addFromText(text);
-    if (added > 0) setTab("inbox"); // после разбора показываем Входящие
+  async function handleCapture(text: string): Promise<string | null> {
+    try {
+      const res = await fetch("/api/parse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      const data = await res.json();
+      if (!res.ok) return data?.error ?? "Что-то пошло не так.";
+
+      const added = addParsed(data.tasks ?? []);
+      if (added > 0) setTab("inbox"); // после разбора показываем Входящие
+      return null; // успех
+    } catch {
+      return "Нет связи с сервером. Проверь интернет.";
+    }
   }
 
   return (
