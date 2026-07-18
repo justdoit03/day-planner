@@ -3,91 +3,69 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabase";
 
+function GoogleIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden>
+      <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.5 29.5 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5 43.5 34.8 43.5 24c0-1.2-.1-2.3-.4-3.5z" />
+      <path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.5 29.5 4.5 24 4.5 16.3 4.5 9.7 8.9 6.3 14.7z" />
+      <path fill="#4CAF50" d="M24 43.5c5.4 0 10.3-2.1 14-5.4l-6.5-5.5c-2 1.5-4.6 2.4-7.5 2.4-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.6 39 16.2 43.5 24 43.5z" />
+      <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4 5.5l6.5 5.5c-.5.4 6.7-4.9 6.7-15 0-1.2-.1-2.3-.9-3.5z" />
+    </svg>
+  );
+}
+
 export default function LoginScreen() {
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const canSend = /\S+@\S+\.\S+/.test(email) && status !== "sending";
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!canSend) return;
-    setStatus("sending");
+  async function signInGoogle() {
+    setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithOtp({
-      email: email.trim(),
-      options: { emailRedirectTo: window.location.origin },
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin },
     });
     if (error) {
-      setError("Не получилось отправить письмо. Проверь адрес и попробуй ещё раз.");
-      setStatus("idle");
-    } else {
-      setStatus("sent");
+      setError("Не получилось начать вход. Попробуй ещё раз.");
+      setLoading(false);
     }
+    // при успехе браузер сам уходит на Google
   }
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-6">
-      <div className="mb-8 text-center">
+      <div className="mb-10 text-center">
         <h1 className="text-3xl font-semibold tracking-tight">Планер дня</h1>
         <p className="mt-2 text-sm text-muted">
           Вывали мысли — AI соберёт из них план на день
         </p>
       </div>
 
-      {status === "sent" ? (
-        <div className="rounded-2xl bg-surface px-5 py-6 text-center">
-          <div className="mb-2 text-3xl">📬</div>
-          <p className="text-[15px] font-medium">Письмо отправлено</p>
-          <p className="mt-1 text-sm text-muted">
-            Открой письмо на <span className="text-foreground">{email}</span> и нажми
-            ссылку — вернёшься сюда уже внутри.
-          </p>
-          <button
-            type="button"
-            onClick={() => setStatus("idle")}
-            className="mt-4 text-sm text-accent"
-          >
-            Ввести другой email
-          </button>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <input
-            type="email"
-            inputMode="email"
-            autoComplete="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="твой@email.com"
-            className="h-14 w-full rounded-2xl bg-surface px-5 text-base placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/40"
-          />
-          {error && (
-            <p className="rounded-xl bg-accent/15 px-4 py-2 text-sm text-accent">
-              {error}
-            </p>
-          )}
-          <button
-            type="submit"
-            disabled={!canSend}
-            className={`flex h-14 w-full items-center justify-center gap-2 rounded-2xl text-base font-semibold transition-all ${
-              canSend
-                ? "bg-accent text-white active:scale-[0.98]"
-                : "bg-surface-2 text-muted"
-            }`}
-          >
-            {status === "sending" ? (
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-            ) : (
-              "Войти по email"
-            )}
-          </button>
-          <p className="mt-1 text-center text-xs text-muted">
-            Пароль не нужен — пришлём ссылку для входа.
-          </p>
-        </form>
+      {error && (
+        <p className="mb-3 rounded-xl bg-accent/15 px-4 py-2 text-center text-sm text-accent">
+          {error}
+        </p>
       )}
+
+      <button
+        type="button"
+        onClick={signInGoogle}
+        disabled={loading}
+        className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-white text-base font-semibold text-zinc-900 transition-all active:scale-[0.98] disabled:opacity-70"
+      >
+        {loading ? (
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-400 border-t-zinc-900" />
+        ) : (
+          <>
+            <GoogleIcon />
+            Войти через Google
+          </>
+        )}
+      </button>
+
+      <p className="mt-4 text-center text-xs text-muted">
+        Быстрый вход в один тап. Пароль не нужен.
+      </p>
     </div>
   );
 }
