@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { supabase } from "./supabase";
 
 // Схема задачи — «контракт» между интерфейсом и AI.
 export type Task = {
@@ -8,11 +9,10 @@ export type Task = {
   title: string;
   done: boolean;
   createdAt: number;
-  today?: boolean; // выбрана в план на сегодня (Фаза 5)
-  // Эти поля проставляет AI (Фаза 3):
+  today?: boolean;
   priority?: "low" | "medium" | "high";
-  estimateMin?: number | null; // оценка времени в минутах
-  dueDate?: string | null; // дедлайн, YYYY-MM-DD
+  estimateMin?: number | null;
+  dueDate?: string | null;
 };
 
 // То, что возвращает сервер после разбора текста через Claude.
@@ -23,60 +23,93 @@ export type ParsedTask = {
   dueDate: string | null;
 };
 
-const STORAGE_KEY = "day-planner:tasks";
+// Строка из базы (snake_case) → задача в приложении (camelCase)
+type Row = {
+  id: string;
+  title: string;
+  done: boolean;
+  today: boolean;
+  priority: "low" | "medium" | "high" | null;
+  estimate_min: number | null;
+  due_date: string | null;
+  created_at: string;
+};
 
-export function useTasks() {
+function fromRow(r: Row): Task {
+  return {
+    id: r.id,
+    title: r.title,
+    done: r.done,
+    today: r.today,
+    priority: r.priority ?? undefined,
+    estimateMin: r.estimate_min,
+    dueDate: r.due_date,
+    createdAt: new Date(r.created_at).getTime(),
+  };
+}
+
+// Задачи хранятся в облаке (Supabase), привязаны к вошедшему пользователю (RLS).
+export function useTasks(userId: string | null) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loaded, setLoaded] = useState(false);
 
-  // Читаем задачи из localStorage при первом запуске
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setTasks(JSON.parse(raw));
-    } catch {
-      // если данные битые — просто начинаем с пустого списка
+  const load = useCallback(async () => {
+    if (!userId) {
+      setTasks([]);
+      setLoaded(true);
+      return;
     }
+    const { data, error } = await supabase
+      .from("tasks")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (!error && data) setTasks((data as Row[]).map(fromRow));
     setLoaded(true);
-  }, []);
+  }, [userId]);
 
-  // Сохраняем задачи при каждом изменении
   useEffect(() => {
-    if (loaded) localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-  }, [tasks, loaded]);
+    setLoaded(false);
+    load();
+  }, [load]);
 
-  // Добавляем задачи, разобранные AI на сервере
-  function addParsed(parsed: ParsedTask[]): number {
+  // Сохраняем задачи, разобранные AI
+  async function addParsed(parsed: ParsedTask[]): Promise<number> {
     if (parsed.length === 0) return 0;
-    const now = Date.now();
-    const created: Task[] = parsed.map((p, i) => ({
-      id: `${now}-${i}`,
+    const rows = parsed.map((p) => ({
       title: p.title,
-      done: false,
-      createdAt: now,
       priority: p.priority,
-      estimateMin: p.estimateMin,
-      dueDate: p.dueDate,
+      estimate_min: p.estimateMin,
+      due_date: p.dueDate,
+      done: false,
+      today: false,
     }));
-    setTasks((prev) => [...created, ...prev]);
-    return created.length;
+    const { data, error } = await supabase.from("tasks").insert(rows).select();
+    if (error || !data) return 0;
+    setTasks((prev) => [...(data as Row[]).map(fromRow), ...prev]);
+    return data.length;
   }
 
-  function toggle(id: string) {
+  async function toggle(id: string) {
+    const t = tasks.find((x) => x.id === id);
+    if (!t) return;
     setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t))
+      prev.map((x) => (x.id === id ? { ...x, done: !x.done } : x))
     );
+    await supabase.from("tasks").update({ done: !t.done }).eq("id", id);
   }
 
-  function remove(id: string) {
-    setTasks((prev) => prev.filter((t) => t.id !== id));
-  }
-
-  // Добавить/убрать задачу из плана на сегодня
-  function toggleToday(id: string) {
+  async function toggleToday(id: string) {
+    const t = tasks.find((x) => x.id === id);
+    if (!t) return;
     setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, today: !t.today } : t))
+      prev.map((x) => (x.id === id ? { ...x, today: !x.today } : x))
     );
+    await supabase.from("tasks").update({ today: !t.today }).eq("id", id);
+  }
+
+  async function remove(id: string) {
+    setTasks((prev) => prev.filter((x) => x.id !== id));
+    await supabase.from("tasks").delete().eq("id", id);
   }
 
   return { tasks, addParsed, toggle, remove, toggleToday, loaded };
