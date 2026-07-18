@@ -8,6 +8,7 @@ export type Task = {
   title: string;
   done: boolean;
   createdAt: number;
+  today?: boolean; // выбрана в план на сегодня (Фаза 5)
   // Эти поля проставляет AI (Фаза 3):
   priority?: "low" | "medium" | "high";
   estimateMin?: number | null; // оценка времени в минутах
@@ -71,5 +72,12 @@ export function useTasks() {
     setTasks((prev) => prev.filter((t) => t.id !== id));
   }
 
-  return { tasks, addParsed, toggle, remove, loaded };
+  // Добавить/убрать задачу из плана на сегодня
+  function toggleToday(id: string) {
+    setTasks((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, today: !t.today } : t))
+    );
+  }
+
+  return { tasks, addParsed, toggle, remove, toggleToday, loaded };
 }
