@@ -106,7 +106,8 @@ export default function TodayScreen({
         <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center text-muted">
           <IconTodayLarge />
           <p className="max-w-xs text-sm">
-            План пуст. Во «Входящих» нажми ☀️ на задачах, которые сделаешь сегодня.
+            План пуст. Надиктуй мысли на «Захвате» — AI сам предложит план на
+            сегодня. Или нажми ☀️ у задач во «Входящих».
           </p>
         </div>
       ) : (

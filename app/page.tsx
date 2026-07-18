@@ -41,8 +41,15 @@ export default function Home() {
       const data = await res.json();
       if (!res.ok) return data?.error ?? "Что-то пошло не так.";
 
-      const added = await addParsed(data.tasks ?? []);
-      if (added > 0) setTab("inbox");
+      const parsed = data.tasks ?? [];
+      const added = await addParsed(parsed);
+      if (added > 0) {
+        // Если AI собрал план на сегодня — показываем «Сегодня», иначе «Входящие»
+        const anyToday = parsed.some(
+          (t: { forToday?: boolean }) => t.forToday === true
+        );
+        setTab(anyToday ? "today" : "inbox");
+      }
       return null;
     } catch {
       return "Нет связи с сервером. Проверь интернет.";

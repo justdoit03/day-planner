@@ -73,7 +73,7 @@ export default function CaptureScreen({
     <section className="flex flex-1 flex-col px-5 pt-8">
       <h1 className="text-2xl font-semibold tracking-tight">Что в голове?</h1>
       <p className="mt-1 text-sm text-muted">
-        Скажи или напиши — AI разберёт на задачи
+        Скажи или напиши — AI разберёт на задачи и соберёт план на сегодня
       </p>
 
       <textarea

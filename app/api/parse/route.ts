@@ -6,6 +6,7 @@ type ParsedTask = {
   priority: "low" | "medium" | "high";
   estimateMin: number | null;
   dueDate: string | null;
+  forToday: boolean; // AI решил, что это стоит сделать сегодня
 };
 
 // Достаём JSON из ответа модели, даже если вокруг него есть лишний текст.
@@ -46,7 +47,14 @@ function normalize(tasks: unknown): ParsedTask[] {
         typeof t.dueDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(t.dueDate)
           ? t.dueDate
           : null;
-      return { title: String(t.title).trim(), priority, estimateMin, dueDate };
+      const forToday = t.forToday === true;
+      return {
+        title: String(t.title).trim(),
+        priority,
+        estimateMin,
+        dueDate,
+        forToday,
+      };
     })
     .filter((t) => t.title.length > 0);
 }
@@ -78,12 +86,15 @@ export async function POST(req: Request) {
     "Ты — парсер задач для планировщика дня. На вход даётся хаотичный текст, " +
     "который пользователь надиктовал или написал. Разбей его на отдельные конкретные задачи.\n" +
     "Ответь СТРОГО валидным JSON такого вида (без markdown, без пояснений, без ```):\n" +
-    '{"tasks":[{"title":"...","priority":"low|medium|high","estimateMin":30,"dueDate":"2026-07-20"}]}\n' +
+    '{"tasks":[{"title":"...","priority":"low|medium|high","estimateMin":30,"dueDate":"2026-07-20","forToday":true}]}\n' +
     "Правила по полям:\n" +
     "- title: краткая понятная формулировка на языке пользователя, с заглавной буквы, без лишних слов.\n" +
     "- priority: 'high' — срочное/важное или с близким дедлайном; 'medium' — обычное; 'low' — мелочь.\n" +
     "- estimateMin: оценка времени в минутах (целое число) или null, если оценить нельзя.\n" +
     "- dueDate: дата в формате YYYY-MM-DD, если в тексте есть срок ('до пятницы', 'завтра', 'к 20-му'); иначе null.\n" +
+    "- forToday: true, если задачу логично сделать СЕГОДНЯ (срочное; дедлайн сегодня или просрочен; " +
+    "явные указания вроде 'сегодня', 'сейчас', 'вечером', 'до конца дня'). Иначе false. " +
+    "Это твой предложенный план на сегодня — будь разумен, не помечай всё подряд.\n" +
     `Сегодня ${today}. Не выдумывай задачи, которых нет в тексте. Одна мысль — одна задача.`;
 
   try {

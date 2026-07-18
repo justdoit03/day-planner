@@ -21,6 +21,7 @@ export type ParsedTask = {
   priority: "low" | "medium" | "high";
   estimateMin: number | null;
   dueDate: string | null;
+  forToday?: boolean; // AI предложил взять в план на сегодня
 };
 
 // Строка из базы (snake_case) → задача в приложении (camelCase)
@@ -81,7 +82,7 @@ export function useTasks(userId: string | null) {
       estimate_min: p.estimateMin,
       due_date: p.dueDate,
       done: false,
-      today: false,
+      today: p.forToday === true, // AI сам предложил план на сегодня
     }));
     const { data, error } = await supabase.from("tasks").insert(rows).select();
     if (error || !data) return 0;
