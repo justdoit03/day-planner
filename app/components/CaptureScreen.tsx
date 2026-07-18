@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSpeech } from "../lib/useSpeech";
 
 function IconMic() {
@@ -29,6 +29,12 @@ export default function CaptureScreen({
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // iPhone? (нужно, чтобы подсказать открыть в Safari, если голос недоступен)
+  const [isIOS, setIsIOS] = useState(false);
+  useEffect(() => {
+    setIsIOS(/iphone|ipad|ipod/i.test(navigator.userAgent));
+  }, []);
 
   // Голосовой ввод: распознанный кусок дописываем в поле
   const speech = useSpeech((chunk) => {
@@ -135,8 +141,10 @@ export default function CaptureScreen({
               >
                 <IconMic />
               </button>
-              <span className="text-xs text-muted">
-                Голос не поддерживается в этом браузере
+              <span className="max-w-[16rem] text-center text-xs text-muted">
+                {isIOS
+                  ? "Голос работает в Safari. Открой ссылку в Safari (в Telegram: «···» → «Открыть в Safari»)."
+                  : "Голос не поддерживается в этом браузере — можно писать текстом."}
               </span>
             </>
           )}
