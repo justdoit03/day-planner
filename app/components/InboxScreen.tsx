@@ -34,11 +34,13 @@ function TaskRow({
   onToggle,
   onDelete,
   onToggleToday,
+  onEdit,
 }: {
   task: Task;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
   onToggleToday: (id: string) => void;
+  onEdit: (task: Task) => void;
 }) {
   return (
     <li className="flex items-start gap-3 rounded-2xl border border-white/[0.05] bg-surface px-4 py-3.5">
@@ -55,7 +57,11 @@ function TaskRow({
         <IconCheck />
       </button>
 
-      <div className="min-w-0 flex-1">
+      <button
+        type="button"
+        onClick={() => onEdit(task)}
+        className="min-w-0 flex-1 text-left"
+      >
         <span
           className={`block text-[15px] ${
             task.done ? "text-muted line-through" : ""
@@ -64,7 +70,7 @@ function TaskRow({
           {task.title}
         </span>
         {!task.done && <TaskMeta task={task} />}
-      </div>
+      </button>
 
       {!task.done && (
         <button
@@ -100,11 +106,15 @@ export default function InboxScreen({
   onToggle,
   onDelete,
   onToggleToday,
+  onEdit,
+  onAdd,
 }: {
   tasks: Task[];
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
   onToggleToday: (id: string) => void;
+  onEdit: (task: Task) => void;
+  onAdd: () => void;
 }) {
   const doneCount = tasks.filter((t) => t.done).length;
 
@@ -123,9 +133,16 @@ export default function InboxScreen({
           <p className="max-w-xs text-sm">
             Поки порожньо. Скажи або напиши щось на екрані «Думки».
           </p>
+          <button
+            type="button"
+            onClick={onAdd}
+            className="mt-2 rounded-full border border-white/[0.07] bg-surface px-4 py-2 text-sm text-muted transition-colors active:bg-surface-2 active:text-foreground"
+          >
+            ➕ Додати задачу вручну
+          </button>
         </div>
       ) : (
-        <ul className="mt-4 flex flex-col gap-2 pb-6">
+        <ul className="mt-4 flex flex-col gap-2 pb-2">
           {tasks.map((task) => (
             <TaskRow
               key={task.id}
@@ -133,9 +150,20 @@ export default function InboxScreen({
               onToggle={onToggle}
               onDelete={onDelete}
               onToggleToday={onToggleToday}
+              onEdit={onEdit}
             />
           ))}
         </ul>
+      )}
+
+      {tasks.length > 0 && (
+        <button
+          type="button"
+          onClick={onAdd}
+          className="mb-6 flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-white/[0.12] text-sm text-muted transition-colors active:bg-surface active:text-foreground"
+        >
+          ➕ Додати задачу
+        </button>
       )}
     </section>
   );

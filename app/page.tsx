@@ -10,7 +10,8 @@ import TodayScreen from "./components/TodayScreen";
 import LoginScreen from "./components/LoginScreen";
 import Onboarding from "./components/Onboarding";
 import ProfileSheet from "./components/ProfileSheet";
-import { useTasks } from "./lib/useTasks";
+import TaskEditorSheet from "./components/TaskEditorSheet";
+import { useTasks, type Task, type TaskFields } from "./lib/useTasks";
 
 export default function Home() {
   const [tab, setTab] = useState<TabKey>("capture");
@@ -19,6 +20,10 @@ export default function Home() {
   const [name, setName] = useState("");
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [editor, setEditor] = useState<{ open: boolean; task: Task | null }>({
+    open: false,
+    task: null,
+  });
 
   // Следим за входом/выходом
   useEffect(() => {
@@ -59,7 +64,17 @@ export default function Home() {
     setName(newName.split(" ")[0]);
   }
 
-  const { tasks, addParsed, toggle, remove, toggleToday } = useTasks(
+  const {
+    tasks,
+    addParsed,
+    addManual,
+    update,
+    toggle,
+    remove,
+    undoDelete,
+    pendingDelete,
+    toggleToday,
+  } = useTasks(
     session?.user?.id ?? null
   );
 
@@ -86,6 +101,11 @@ export default function Home() {
     } catch {
       return "Немає зв'язку з сервером. Перевір інтернет.";
     }
+  }
+
+  function handleEditorSave(fields: TaskFields) {
+    if (editor.task) update(editor.task.id, fields);
+    else addManual(fields);
   }
 
   const todayTasks = tasks.filter((t) => t.today);
@@ -155,6 +175,8 @@ export default function Home() {
               onToggle={toggle}
               onDelete={remove}
               onToggleToday={toggleToday}
+              onEdit={(task) => setEditor({ open: true, task })}
+              onAdd={() => setEditor({ open: true, task: null })}
             />
           )}
           {tab === "today" && (
@@ -166,6 +188,26 @@ export default function Home() {
           )}
         </div>
       </main>
+      <TaskEditorSheet
+        open={editor.open}
+        task={editor.task}
+        onClose={() => setEditor({ open: false, task: null })}
+        onSave={handleEditorSave}
+      />
+
+      {pendingDelete && (
+        <div className="animate-fade-in fixed bottom-24 left-1/2 z-40 flex -translate-x-1/2 items-center gap-3 rounded-full border border-white/[0.08] bg-surface-2 py-2.5 pl-5 pr-2.5 shadow-xl">
+          <span className="text-sm">Задачу видалено</span>
+          <button
+            type="button"
+            onClick={undoDelete}
+            className="rounded-full bg-accent/20 px-3.5 py-1.5 text-sm font-semibold text-accent"
+          >
+            Повернути
+          </button>
+        </div>
+      )}
+
       <TabBar active={tab} onChange={setTab} />
     </div>
   );

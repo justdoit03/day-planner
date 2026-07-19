@@ -20,6 +20,46 @@ function IconStop() {
   );
 }
 
+const EXAMPLE_DUMP =
+  "сьогодні терміново дописати звіт для клієнта до вечора, подзвонити мамі привітати з днем народження, " +
+  "купити продукти на тиждень, записатися до стоматолога на наступний тиждень, " +
+  "оплатити комуналку до 25-го, і колись нарешті розібрати фотографії з відпустки";
+
+// Скелетон-карточки: AI «матеріалізує» задачі
+function AiSkeleton() {
+  return (
+    <div className="mt-5 flex flex-1 flex-col">
+      <p className="mb-4 flex items-center gap-2 text-sm text-muted">
+        <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-border border-t-accent" />
+        AI розбирає думки на задачі…
+      </p>
+      <div className="flex flex-col gap-2.5">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className="animate-pulse rounded-2xl border border-white/[0.05] bg-surface px-4 py-4"
+            style={{ animationDelay: `${i * 0.18}s` }}
+          >
+            <div className="flex items-center gap-3">
+              <div className="h-6 w-6 rounded-full bg-surface-2" />
+              <div className="flex-1">
+                <div
+                  className="h-3.5 rounded bg-surface-2"
+                  style={{ width: `${75 - i * 12}%` }}
+                />
+                <div className="mt-2 flex gap-2">
+                  <div className="h-2.5 w-14 rounded bg-surface-2" />
+                  <div className="h-2.5 w-10 rounded bg-surface-2" />
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function greeting(): string {
   const h = new Date().getHours();
   if (h < 6) return "Доброї ночі";
@@ -91,13 +131,27 @@ export default function CaptureScreen({
         Скажи або напиши — AI розбере на задачі та збере план на сьогодні
       </p>
 
-      <textarea
-        value={displayValue}
-        onChange={(e) => setText(e.target.value)}
-        disabled={loading}
-        className="mt-5 w-full flex-1 resize-none bg-transparent text-lg leading-relaxed placeholder:text-muted focus:outline-none disabled:opacity-60"
-        placeholder={"Наприклад: подзвонити мамі, купити квитки на потяг, дописати звіт до п'ятниці, записатися до лікаря"}
-      />
+      {loading ? (
+        <AiSkeleton />
+      ) : (
+        <>
+          <textarea
+            value={displayValue}
+            onChange={(e) => setText(e.target.value)}
+            className="mt-5 w-full flex-1 resize-none bg-transparent text-lg leading-relaxed placeholder:text-muted focus:outline-none"
+            placeholder={"Наприклад: подзвонити мамі, купити квитки на потяг, дописати звіт до п'ятниці, записатися до лікаря"}
+          />
+          {!text.trim() && !speech.listening && (
+            <button
+              type="button"
+              onClick={() => setText(EXAMPLE_DUMP)}
+              className="mb-3 self-start rounded-full border border-white/[0.07] bg-surface px-4 py-2 text-sm text-muted transition-colors active:bg-surface-2 active:text-foreground"
+            >
+              ✨ Спробувати з прикладом
+            </button>
+          )}
+        </>
+      )}
 
       {(error || speech.error) && (
         <p className="mb-2 rounded-xl bg-danger/15 px-4 py-2 text-sm text-danger">
