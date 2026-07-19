@@ -9,6 +9,7 @@ import InboxScreen from "./components/InboxScreen";
 import TodayScreen from "./components/TodayScreen";
 import LoginScreen from "./components/LoginScreen";
 import Onboarding from "./components/Onboarding";
+import ProfileSheet from "./components/ProfileSheet";
 import { useTasks } from "./lib/useTasks";
 
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
   const [authReady, setAuthReady] = useState(false);
   const [name, setName] = useState("");
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   // Следим за входом/выходом
   useEffect(() => {
@@ -50,6 +52,11 @@ export default function Home() {
     }
     if (clean) setName(clean.split(" ")[0]);
     setNeedsOnboarding(false);
+  }
+
+  function saveName(newName: string) {
+    supabase.auth.updateUser({ data: { name: newName } });
+    setName(newName.split(" ")[0]);
   }
 
   const { tasks, addParsed, toggle, remove, toggleToday } = useTasks(
@@ -104,11 +111,38 @@ export default function Home() {
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col border-border sm:border-x">
       <button
         type="button"
-        onClick={() => supabase.auth.signOut()}
-        className="absolute right-4 top-3 z-10 text-xs text-muted active:text-foreground"
+        onClick={() => setProfileOpen(true)}
+        aria-label="Профіль"
+        className="absolute right-4 top-3 z-10 active:scale-95"
       >
-        Вийти
+        {session.user.user_metadata?.avatar_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={session.user.user_metadata.avatar_url as string}
+            alt=""
+            className="h-9 w-9 rounded-full border border-white/15"
+            referrerPolicy="no-referrer"
+          />
+        ) : (
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-sm font-semibold text-white">
+            {(name || "?").slice(0, 1).toUpperCase()}
+          </span>
+        )}
       </button>
+
+      <ProfileSheet
+        open={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        avatarUrl={(session.user.user_metadata?.avatar_url as string) ?? null}
+        name={name}
+        email={session.user.email ?? ""}
+        tasks={tasks}
+        onSaveName={saveName}
+        onSignOut={() => {
+          setProfileOpen(false);
+          supabase.auth.signOut();
+        }}
+      />
 
       <main className="flex flex-1 flex-col overflow-y-auto">
         <div key={tab} className="animate-fade-in flex flex-1 flex-col">
