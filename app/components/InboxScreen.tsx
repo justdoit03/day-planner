@@ -45,7 +45,7 @@ function TaskRow({
       <button
         type="button"
         onClick={() => onToggle(task.id)}
-        aria-label={task.done ? "Снять отметку" : "Отметить выполненной"}
+        aria-label={task.done ? "Зняти позначку" : "Позначити виконаною"}
         className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
           task.done
             ? "border-accent bg-accent text-white"
@@ -70,7 +70,7 @@ function TaskRow({
         <button
           type="button"
           onClick={() => onToggleToday(task.id)}
-          aria-label={task.today ? "Убрать из сегодня" : "В план на сегодня"}
+          aria-label={task.today ? "Прибрати з сьогодні" : "У план на сьогодні"}
           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${
             task.today
               ? "bg-amber-400/20 text-amber-400"
@@ -84,7 +84,7 @@ function TaskRow({
       <button
         type="button"
         onClick={() => onDelete(task.id)}
-        aria-label="Удалить задачу"
+        aria-label="Видалити задачу"
         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted active:bg-surface-2"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -110,18 +110,18 @@ export default function InboxScreen({
 
   return (
     <section className="flex flex-1 flex-col px-5 pt-8">
-      <h1 className="text-2xl font-semibold tracking-tight">Входящие</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Вхідні</h1>
       <p className="mt-1 text-sm text-muted">
         {tasks.length === 0
-          ? "Сюда попадут задачи из твоих мыслей"
-          : `Задач: ${tasks.length} · выполнено: ${doneCount}`}
+          ? "Сюди потраплять задачі з твоїх думок"
+          : `Задач: ${tasks.length} · виконано: ${doneCount}`}
       </p>
 
       {tasks.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center text-muted">
           <IconInboxLarge />
           <p className="max-w-xs text-sm">
-            Пока пусто. Напиши что-нибудь на экране «Захват».
+            Поки порожньо. Скажи або напиши щось на екрані «Думки».
           </p>
         </div>
       ) : (

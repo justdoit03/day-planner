@@ -29,7 +29,7 @@ export function useSpeech(onFinal: (chunk: string) => void) {
     setSupported(true);
 
     const rec = new SR();
-    rec.lang = "ru-RU";
+    rec.lang = "uk-UA";
     rec.continuous = true;
     rec.interimResults = true;
 
@@ -50,9 +50,9 @@ export function useSpeech(onFinal: (chunk: string) => void) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     rec.onerror = (e: any) => {
       if (e.error === "not-allowed" || e.error === "service-not-allowed") {
-        setError("Нет доступа к микрофону. Разреши его в браузере.");
+        setError("Немає доступу до мікрофона. Дозволь його в браузері.");
       } else if (e.error !== "no-speech" && e.error !== "aborted") {
-        setError("Не получилось распознать. Попробуй ещё раз.");
+        setError("Не вдалося розпізнати. Спробуй ще раз.");
       }
       setListening(false);
     };

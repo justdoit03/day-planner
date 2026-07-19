@@ -22,10 +22,10 @@ function IconStop() {
 
 function greeting(): string {
   const h = new Date().getHours();
-  if (h < 6) return "Доброй ночи";
-  if (h < 12) return "Доброе утро";
-  if (h < 18) return "Добрый день";
-  return "Добрый вечер";
+  if (h < 6) return "Доброї ночі";
+  if (h < 12) return "Доброго ранку";
+  if (h < 18) return "Доброго дня";
+  return "Доброго вечора";
 }
 
 export default function CaptureScreen({
@@ -86,9 +86,9 @@ export default function CaptureScreen({
           {greeting()}, <span className="text-foreground">{name}</span> 👋
         </p>
       ) : null}
-      <h1 className="text-2xl font-semibold tracking-tight">Что в голове?</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Що в голові?</h1>
       <p className="mt-1 text-sm text-muted">
-        Скажи или напиши — AI разберёт на задачи и соберёт план на сегодня
+        Скажи або напиши — AI розбере на задачі та збере план на сьогодні
       </p>
 
       <textarea
@@ -96,7 +96,7 @@ export default function CaptureScreen({
         onChange={(e) => setText(e.target.value)}
         disabled={loading}
         className="mt-5 w-full flex-1 resize-none bg-transparent text-lg leading-relaxed placeholder:text-muted focus:outline-none disabled:opacity-60"
-        placeholder={"Например: позвонить маме, купить билеты на поезд, доделать отчёт до пятницы, записаться к врачу"}
+        placeholder={"Наприклад: подзвонити мамі, купити квитки на потяг, дописати звіт до п'ятниці, записатися до лікаря"}
       />
 
       {(error || speech.error) && (
@@ -119,10 +119,10 @@ export default function CaptureScreen({
           {loading ? (
             <>
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-              Разбираю…
+              Розбираю…
             </>
           ) : (
-            "Разобрать в задачи"
+            "Розібрати в задачі"
           )}
         </button>
 
@@ -133,7 +133,7 @@ export default function CaptureScreen({
                 type="button"
                 onClick={toggleMic}
                 disabled={loading}
-                aria-label={speech.listening ? "Остановить запись" : "Диктовать голосом"}
+                aria-label={speech.listening ? "Зупинити запис" : "Диктувати голосом"}
                 className={`flex h-16 w-16 items-center justify-center rounded-full transition-all active:scale-95 ${
                   speech.listening
                     ? "animate-pulse bg-accent text-white shadow-lg"
@@ -143,7 +143,7 @@ export default function CaptureScreen({
                 {speech.listening ? <IconStop /> : <IconMic />}
               </button>
               <span className="text-xs text-muted">
-                {speech.listening ? "Слушаю… нажми, чтобы остановить" : "Нажми и говори"}
+                {speech.listening ? "Слухаю… натисни, щоб зупинити" : "Натисни і говори"}
               </span>
             </>
           ) : (
@@ -151,15 +151,15 @@ export default function CaptureScreen({
               <button
                 type="button"
                 disabled
-                aria-label="Голос недоступен"
+                aria-label="Голос недоступний"
                 className="flex h-12 w-12 items-center justify-center rounded-full border border-border text-muted opacity-50"
               >
                 <IconMic />
               </button>
               <span className="max-w-[16rem] text-center text-xs text-muted">
                 {isIOS
-                  ? "Голос работает в Safari. Открой ссылку в Safari (в Telegram: «···» → «Открыть в Safari»)."
-                  : "Голос не поддерживается в этом браузере — можно писать текстом."}
+                  ? "Голос працює в Safari. Відкрий посилання в Safari (у Telegram: «···» → «Відкрити в Safari»)."
+                  : "Голос не підтримується в цьому браузері — можна писати текстом."}
               </span>
             </>
           )}

@@ -64,7 +64,7 @@ export default function Home() {
         body: JSON.stringify({ text }),
       });
       const data = await res.json();
-      if (!res.ok) return data?.error ?? "Что-то пошло не так.";
+      if (!res.ok) return data?.error ?? "Щось пішло не так.";
 
       const parsed = data.tasks ?? [];
       const added = await addParsed(parsed);
@@ -77,7 +77,7 @@ export default function Home() {
       }
       return null;
     } catch {
-      return "Нет связи с сервером. Проверь интернет.";
+      return "Немає зв'язку з сервером. Перевір інтернет.";
     }
   }
 
@@ -107,7 +107,7 @@ export default function Home() {
         onClick={() => supabase.auth.signOut()}
         className="absolute right-4 top-3 z-10 text-xs text-muted active:text-foreground"
       >
-        Выйти
+        Вийти
       </button>
 
       <main className="flex flex-1 flex-col overflow-y-auto">

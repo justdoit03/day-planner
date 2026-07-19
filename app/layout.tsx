@@ -8,8 +8,9 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Планер дня",
-  description: "AI-планер дня: вывали мысли — получи план на сегодня",
+  title: "Ясно — AI-планер дня",
+  description:
+    "Скажи, що в голові — AI розкладе все по поличках і збере план на сьогодні",
 };
 
 export const viewport: Viewport = {
@@ -24,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru" className={`${geistSans.variable} h-full antialiased`}>
+    <html lang="uk" className={`${geistSans.variable} h-full antialiased`}>
       <body className="min-h-full">{children}</body>
     </html>
   );

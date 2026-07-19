@@ -26,7 +26,7 @@ export default function LoginScreen() {
       options: { redirectTo: window.location.origin },
     });
     if (error) {
-      setError("Не получилось начать вход. Попробуй ещё раз.");
+      setError("Не вдалося почати вхід. Спробуй ще раз.");
       setLoading(false);
     }
     // при успехе браузер сам уходит на Google
@@ -35,9 +35,15 @@ export default function LoginScreen() {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-6">
       <div className="mb-10 text-center">
-        <h1 className="text-3xl font-semibold tracking-tight">Планер дня</h1>
+        {/* Мини-логотип */}
+        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-[20px] bg-gradient-to-br from-[#8280ff] to-[#5a57e6] shadow-lg shadow-accent/30">
+          <svg width="30" height="30" viewBox="0 0 512 512" fill="none">
+            <path d="M292 84 152 300h86l-22 128 168-212h-92z" fill="#fff" />
+          </svg>
+        </div>
+        <h1 className="text-4xl font-semibold tracking-tight">Ясно</h1>
         <p className="mt-2 text-sm text-muted">
-          Вывали мысли — AI соберёт из них план на день
+          Скажи, що в голові — стане ясно, що робити
         </p>
       </div>
 
@@ -58,13 +64,13 @@ export default function LoginScreen() {
         ) : (
           <>
             <GoogleIcon />
-            Войти через Google
+            Увійти через Google
           </>
         )}
       </button>
 
       <p className="mt-4 text-center text-xs text-muted">
-        Быстрый вход в один тап. Пароль не нужен.
+        Швидкий вхід в один тап. Пароль не потрібен.
       </p>
     </div>
   );

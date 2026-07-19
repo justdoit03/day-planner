@@ -33,9 +33,9 @@ function IconToday() {
 }
 
 const tabs: { key: TabKey; label: string; icon: ReactNode }[] = [
-  { key: "capture", label: "Захват", icon: <IconCapture /> },
-  { key: "inbox", label: "Входящие", icon: <IconInbox /> },
-  { key: "today", label: "Сегодня", icon: <IconToday /> },
+  { key: "capture", label: "Думки", icon: <IconCapture /> },
+  { key: "inbox", label: "Вхідні", icon: <IconInbox /> },
+  { key: "today", label: "Сьогодні", icon: <IconToday /> },
 ];
 
 export default function TabBar({

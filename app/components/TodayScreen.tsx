@@ -9,9 +9,9 @@ const TIERS = ["high", "medium", "low"] as const;
 type Tier = (typeof TIERS)[number];
 
 const tierInfo: Record<Tier, { emoji: string; label: string }> = {
-  high: { emoji: "🔴", label: "Важно" },
-  medium: { emoji: "🟡", label: "Средне" },
-  low: { emoji: "⚪", label: "Не срочно" },
+  high: { emoji: "🔴", label: "Важливо" },
+  medium: { emoji: "🟡", label: "Середнє" },
+  low: { emoji: "⚪", label: "Не терміново" },
 };
 
 function tierOf(t: Task): Tier {
@@ -22,7 +22,7 @@ function pluralTask(n: number): string {
   const a = n % 10;
   const b = n % 100;
   if (a === 1 && b !== 11) return "задача";
-  if (a >= 2 && a <= 4 && (b < 10 || b >= 20)) return "задачи";
+  if (a >= 2 && a <= 4 && (b < 10 || b >= 20)) return "задачі";
   return "задач";
 }
 
@@ -30,9 +30,9 @@ function formatTotal(min: number): string {
   if (min <= 0) return "";
   const h = Math.floor(min / 60);
   const m = min % 60;
-  if (h && m) return `~${h} ч ${m} мин`;
-  if (h) return `~${h} ч`;
-  return `~${m} мин`;
+  if (h && m) return `~${h} год ${m} хв`;
+  if (h) return `~${h} год`;
+  return `~${m} хв`;
 }
 
 function IconCheck() {
@@ -85,7 +85,7 @@ export default function TodayScreen({
 }) {
   const [focus, setFocus] = useState(false);
 
-  const today = new Date().toLocaleDateString("ru-RU", {
+  const today = new Date().toLocaleDateString("uk-UA", {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -124,11 +124,11 @@ export default function TodayScreen({
           <Confetti />
           <div className="text-6xl">🎉</div>
           <h1 className="text-2xl font-semibold tracking-tight">
-            План на день выполнен!
+            План на день виконано!
           </h1>
           <p className="max-w-xs text-sm text-muted">
-            Ты закрыл {total}{" "}
-            {total % 10 === 1 && total % 100 !== 11 ? "задачу" : "задач"}. Красавчик 💪
+            Ти закрив {total}{" "}
+            {total % 10 === 1 && total % 100 !== 11 ? "задачу" : "задач"}. Красунчик 💪
           </p>
           <button
             type="button"
@@ -150,14 +150,14 @@ export default function TodayScreen({
         <div className="mb-5">
           <div className="mb-2 flex items-center justify-between">
             <span className="text-xs font-medium text-muted">
-              Фокус · {doneCount} из {total}
+              Фокус · {doneCount} із {total}
             </span>
             <button
               type="button"
               onClick={() => setFocus(false)}
               className="text-xs text-muted active:text-foreground"
             >
-              Выйти
+              Вийти
             </button>
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
@@ -170,14 +170,14 @@ export default function TodayScreen({
 
         {flash && (
           <div className="mb-4 rounded-2xl bg-accent/15 px-4 py-3 text-center text-sm font-medium text-accent">
-            Блок закрыт! 🎉 Дальше →
+            Блок закрито! 🎉 Далі →
           </div>
         )}
 
         <div className="mb-1 text-3xl">{info.emoji}</div>
         <h1 className="text-2xl font-semibold tracking-tight">{info.label}</h1>
         <p className="mt-1 text-sm text-muted">
-          Разбери этот блок — осталось {items.length}
+          Розбери цей блок — залишилось {items.length}
         </p>
 
         <ul className="mt-5 flex flex-col gap-2.5 pb-6">
@@ -204,13 +204,13 @@ export default function TodayScreen({
   // ---------- ОБЫЧНЫЙ ВИД (группировка) ----------
   return (
     <section className="flex flex-1 flex-col px-5 pt-8">
-      <h1 className="text-2xl font-semibold tracking-tight">Сегодня</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Сьогодні</h1>
       <p className="mt-1 text-sm capitalize text-muted">
         {today}
         {total > 0 && (
           <span className="lowercase">
             {" "}
-            · {doneCount} из {total}
+            · {doneCount} із {total}
           </span>
         )}
       </p>
@@ -219,8 +219,8 @@ export default function TodayScreen({
         <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center text-muted">
           <IconTodayLarge />
           <p className="max-w-xs text-sm">
-            План пуст. Надиктуй мысли на «Захвате» — AI сам предложит план на
-            сегодня. Или нажми ☀️ у задач во «Входящих».
+            План порожній. Надиктуй думки на екрані «Думки» — AI сам запропонує
+            план на сьогодні. Або натисни ☀️ біля задач у «Вхідних».
           </p>
         </div>
       ) : (
@@ -232,7 +232,7 @@ export default function TodayScreen({
                 <div className="mt-5 flex items-start gap-3 rounded-2xl border border-accent/20 bg-accent/[0.08] px-4 py-3.5">
                   <span className="text-lg leading-none">🎉</span>
                   <p className="text-sm leading-relaxed">
-                    Всё на сегодня сделано. Красавчик — можно выдохнуть.
+                    Усе на сьогодні зроблено. Красунчик — можна видихнути.
                   </p>
                 </div>
               );
@@ -250,8 +250,8 @@ export default function TodayScreen({
               <div className="mt-5 flex items-start gap-3 rounded-2xl border border-accent/20 bg-accent/[0.08] px-4 py-3.5">
                 <span className="text-lg leading-none">✨</span>
                 <p className="text-sm leading-relaxed">
-                  На сегодня {undone.length} {pluralTask(undone.length)}
-                  {time ? ` · ${time}` : ""}. Начни с «{top.title}».
+                  На сьогодні {undone.length} {pluralTask(undone.length)}
+                  {time ? ` · ${time}` : ""}. Почни з «{top.title}».
                 </p>
               </div>
             );
@@ -264,7 +264,7 @@ export default function TodayScreen({
               className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-base font-semibold text-white shadow-lg shadow-accent/25 transition-transform active:scale-[0.98]"
             >
               <IconBolt />
-              Фокус — вести по плану
+              Фокус — веди мене по плану
             </button>
           )}
 
@@ -297,7 +297,7 @@ export default function TodayScreen({
             {done.length > 0 && (
               <div>
                 <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
-                  Сделано · {done.length}
+                  Зроблено · {done.length}
                 </div>
                 <ul className="flex flex-col gap-2">
                   {done.map((task) => (
@@ -332,7 +332,7 @@ function TaskRow({
       <button
         type="button"
         onClick={() => onToggle(task.id)}
-        aria-label={task.done ? "Снять отметку" : "Отметить выполненной"}
+        aria-label={task.done ? "Зняти позначку" : "Позначити виконаною"}
       >
         <Checkbox done={task.done} />
       </button>
@@ -349,7 +349,7 @@ function TaskRow({
       <button
         type="button"
         onClick={() => onToggleToday(task.id)}
-        aria-label="Убрать из плана на сегодня"
+        aria-label="Прибрати з плану на сьогодні"
         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-muted active:bg-surface-2"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
