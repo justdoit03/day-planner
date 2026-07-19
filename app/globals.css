@@ -45,3 +45,30 @@ body {
 * {
   -webkit-tap-highlight-color: transparent;
 }
+
+/* Плавное появление экрана при переключении вкладок */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out;
+}
+
+/* Конфетти в финале «Фокуса» */
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(720deg);
+    opacity: 0;
+  }
+}

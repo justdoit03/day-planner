@@ -20,11 +20,21 @@ function IconStop() {
   );
 }
 
+function greeting(): string {
+  const h = new Date().getHours();
+  if (h < 6) return "Доброй ночи";
+  if (h < 12) return "Доброе утро";
+  if (h < 18) return "Добрый день";
+  return "Добрый вечер";
+}
+
 export default function CaptureScreen({
   onCapture,
+  name,
 }: {
   // возвращает текст ошибки или null при успехе
   onCapture: (text: string) => Promise<string | null>;
+  name?: string;
 }) {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -71,6 +81,11 @@ export default function CaptureScreen({
 
   return (
     <section className="flex flex-1 flex-col px-5 pt-8">
+      {name ? (
+        <p className="mb-1 text-sm text-muted">
+          {greeting()}, <span className="text-foreground">{name}</span> 👋
+        </p>
+      ) : null}
       <h1 className="text-2xl font-semibold tracking-tight">Что в голове?</h1>
       <p className="mt-1 text-sm text-muted">
         Скажи или напиши — AI разберёт на задачи и соберёт план на сегодня

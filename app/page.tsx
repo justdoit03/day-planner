@@ -8,12 +8,15 @@ import CaptureScreen from "./components/CaptureScreen";
 import InboxScreen from "./components/InboxScreen";
 import TodayScreen from "./components/TodayScreen";
 import LoginScreen from "./components/LoginScreen";
+import Onboarding from "./components/Onboarding";
 import { useTasks } from "./lib/useTasks";
 
 export default function Home() {
   const [tab, setTab] = useState<TabKey>("capture");
   const [session, setSession] = useState<Session | null>(null);
   const [authReady, setAuthReady] = useState(false);
+  const [name, setName] = useState("");
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
   // Следим за входом/выходом
   useEffect(() => {
@@ -26,6 +29,28 @@ export default function Home() {
     });
     return () => sub.subscription.unsubscribe();
   }, []);
+
+  // Имя (из Google или заданное) + показать онбординг при первом входе
+  useEffect(() => {
+    const user = session?.user;
+    if (!user) return;
+    const meta = user.user_metadata ?? {};
+    const full = (meta.name || meta.full_name || "") as string;
+    setName(full.split(" ")[0] || "");
+    const key = `day-planner:onboarded:${user.id}`;
+    setNeedsOnboarding(!localStorage.getItem(key));
+  }, [session]);
+
+  function finishOnboarding(finalName: string) {
+    const user = session?.user;
+    const clean = finalName.trim();
+    if (user) {
+      if (clean) supabase.auth.updateUser({ data: { name: clean } });
+      localStorage.setItem(`day-planner:onboarded:${user.id}`, "1");
+    }
+    if (clean) setName(clean.split(" ")[0]);
+    setNeedsOnboarding(false);
+  }
 
   const { tasks, addParsed, toggle, remove, toggleToday } = useTasks(
     session?.user?.id ?? null
@@ -71,6 +96,10 @@ export default function Home() {
     return <LoginScreen />;
   }
 
+  if (needsOnboarding) {
+    return <Onboarding initialName={name} onDone={finishOnboarding} />;
+  }
+
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col border-border sm:border-x">
       <button
@@ -82,22 +111,26 @@ export default function Home() {
       </button>
 
       <main className="flex flex-1 flex-col overflow-y-auto">
-        {tab === "capture" && <CaptureScreen onCapture={handleCapture} />}
-        {tab === "inbox" && (
-          <InboxScreen
-            tasks={tasks}
-            onToggle={toggle}
-            onDelete={remove}
-            onToggleToday={toggleToday}
-          />
-        )}
-        {tab === "today" && (
-          <TodayScreen
-            tasks={todayTasks}
-            onToggle={toggle}
-            onToggleToday={toggleToday}
-          />
-        )}
+        <div key={tab} className="animate-fade-in flex flex-1 flex-col">
+          {tab === "capture" && (
+            <CaptureScreen onCapture={handleCapture} name={name} />
+          )}
+          {tab === "inbox" && (
+            <InboxScreen
+              tasks={tasks}
+              onToggle={toggle}
+              onDelete={remove}
+              onToggleToday={toggleToday}
+            />
+          )}
+          {tab === "today" && (
+            <TodayScreen
+              tasks={todayTasks}
+              onToggle={toggle}
+              onToggleToday={toggleToday}
+            />
+          )}
+        </div>
       </main>
       <TabBar active={tab} onChange={setTab} />
     </div>

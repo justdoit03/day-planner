@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Task } from "../lib/useTasks";
 import TaskMeta from "./TaskMeta";
+import Confetti from "./Confetti";
 
 const TIERS = ["high", "medium", "low"] as const;
 type Tier = (typeof TIERS)[number];
@@ -120,6 +121,7 @@ export default function TodayScreen({
     if (!currentTier) {
       return (
         <section className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
+          <Confetti />
           <div className="text-6xl">🎉</div>
           <h1 className="text-2xl font-semibold tracking-tight">
             План на день выполнен!
