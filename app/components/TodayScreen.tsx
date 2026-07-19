@@ -1,7 +1,37 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import type { Task } from "../lib/useTasks";
 import TaskMeta from "./TaskMeta";
+
+const TIERS = ["high", "medium", "low"] as const;
+type Tier = (typeof TIERS)[number];
+
+const tierInfo: Record<Tier, { emoji: string; label: string }> = {
+  high: { emoji: "🔴", label: "Важно" },
+  medium: { emoji: "🟡", label: "Средне" },
+  low: { emoji: "⚪", label: "Не срочно" },
+};
+
+function tierOf(t: Task): Tier {
+  return (t.priority ?? "medium") as Tier;
+}
+
+function IconCheck() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
+
+function IconBolt() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M13 2 3 14h7l-1 8 11-13h-7l1-7z" />
+    </svg>
+  );
+}
 
 function IconTodayLarge() {
   return (
@@ -13,11 +43,227 @@ function IconTodayLarge() {
   );
 }
 
-function IconCheck() {
+// Небольшой чекбокс-кружок
+function Checkbox({ done }: { done: boolean }) {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 6 9 17l-5-5" />
-    </svg>
+    <span
+      className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+        done ? "border-accent bg-accent text-white" : "border-border text-transparent"
+      }`}
+    >
+      <IconCheck />
+    </span>
+  );
+}
+
+export default function TodayScreen({
+  tasks,
+  onToggle,
+  onToggleToday,
+}: {
+  tasks: Task[];
+  onToggle: (id: string) => void;
+  onToggleToday: (id: string) => void;
+}) {
+  const [focus, setFocus] = useState(false);
+
+  const today = new Date().toLocaleDateString("ru-RU", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+
+  const total = tasks.length;
+  const done = tasks.filter((t) => t.done);
+  const undone = tasks.filter((t) => !t.done);
+  const doneCount = done.length;
+
+  // Текущий тир в фокусе = самый высокий приоритет среди невыполненных
+  const currentTier: Tier | null =
+    TIERS.find((tier) => undone.some((t) => tierOf(t) === tier)) ?? null;
+
+  // Микро-поздравление при переходе на следующий блок
+  const [flash, setFlash] = useState(false);
+  const prevTierRef = useRef<Tier | null>(currentTier);
+  useEffect(() => {
+    if (focus && prevTierRef.current && prevTierRef.current !== currentTier) {
+      setFlash(true);
+      const t = setTimeout(() => setFlash(false), 1500);
+      prevTierRef.current = currentTier;
+      return () => clearTimeout(t);
+    }
+    prevTierRef.current = currentTier;
+  }, [currentTier, focus]);
+
+  const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+
+  // ---------- РЕЖИМ ФОКУСА ----------
+  if (focus) {
+    // Всё сделано → поздравление
+    if (!currentTier) {
+      return (
+        <section className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
+          <div className="text-6xl">🎉</div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            План на день выполнен!
+          </h1>
+          <p className="max-w-xs text-sm text-muted">
+            Ты закрыл {total}{" "}
+            {total % 10 === 1 && total % 100 !== 11 ? "задачу" : "задач"}. Красавчик 💪
+          </p>
+          <button
+            type="button"
+            onClick={() => setFocus(false)}
+            className="mt-2 h-12 rounded-2xl bg-accent px-8 text-base font-semibold text-white active:scale-[0.98]"
+          >
+            Готово
+          </button>
+        </section>
+      );
+    }
+
+    const info = tierInfo[currentTier];
+    const items = undone.filter((t) => tierOf(t) === currentTier);
+
+    return (
+      <section className="flex flex-1 flex-col px-5 pt-5">
+        {/* Верх: прогресс + выход */}
+        <div className="mb-5">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-xs font-medium text-muted">
+              Фокус · {doneCount} из {total}
+            </span>
+            <button
+              type="button"
+              onClick={() => setFocus(false)}
+              className="text-xs text-muted active:text-foreground"
+            >
+              Выйти
+            </button>
+          </div>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-2">
+            <div
+              className="h-full rounded-full bg-accent transition-all duration-500"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+        </div>
+
+        {flash && (
+          <div className="mb-4 rounded-2xl bg-accent/15 px-4 py-3 text-center text-sm font-medium text-accent">
+            Блок закрыт! 🎉 Дальше →
+          </div>
+        )}
+
+        <div className="mb-1 text-3xl">{info.emoji}</div>
+        <h1 className="text-2xl font-semibold tracking-tight">{info.label}</h1>
+        <p className="mt-1 text-sm text-muted">
+          Разбери этот блок — осталось {items.length}
+        </p>
+
+        <ul className="mt-5 flex flex-col gap-2.5 pb-6">
+          {items.map((task) => (
+            <li key={task.id}>
+              <button
+                type="button"
+                onClick={() => onToggle(task.id)}
+                className="flex w-full items-start gap-3 rounded-2xl bg-surface px-4 py-4 text-left transition-transform active:scale-[0.99]"
+              >
+                <Checkbox done={false} />
+                <div className="min-w-0 flex-1">
+                  <span className="block text-base">{task.title}</span>
+                  <TaskMeta task={task} />
+                </div>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
+    );
+  }
+
+  // ---------- ОБЫЧНЫЙ ВИД (группировка) ----------
+  return (
+    <section className="flex flex-1 flex-col px-5 pt-8">
+      <h1 className="text-2xl font-semibold tracking-tight">Сегодня</h1>
+      <p className="mt-1 text-sm capitalize text-muted">
+        {today}
+        {total > 0 && (
+          <span className="lowercase">
+            {" "}
+            · {doneCount} из {total}
+          </span>
+        )}
+      </p>
+
+      {total === 0 ? (
+        <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center text-muted">
+          <IconTodayLarge />
+          <p className="max-w-xs text-sm">
+            План пуст. Надиктуй мысли на «Захвате» — AI сам предложит план на
+            сегодня. Или нажми ☀️ у задач во «Входящих».
+          </p>
+        </div>
+      ) : (
+        <>
+          {undone.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setFocus(true)}
+              className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-base font-semibold text-white transition-transform active:scale-[0.98]"
+            >
+              <IconBolt />
+              Фокус — вести по плану
+            </button>
+          )}
+
+          <div className="mt-5 flex flex-col gap-5 pb-6">
+            {TIERS.map((tier) => {
+              const items = undone.filter((t) => tierOf(t) === tier);
+              if (items.length === 0) return null;
+              const info = tierInfo[tier];
+              return (
+                <div key={tier}>
+                  <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted">
+                    <span>{info.emoji}</span>
+                    {info.label}
+                    <span className="text-muted/60">· {items.length}</span>
+                  </div>
+                  <ul className="flex flex-col gap-2">
+                    {items.map((task) => (
+                      <TaskRow
+                        key={task.id}
+                        task={task}
+                        onToggle={onToggle}
+                        onToggleToday={onToggleToday}
+                      />
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+
+            {done.length > 0 && (
+              <div>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
+                  Сделано · {done.length}
+                </div>
+                <ul className="flex flex-col gap-2">
+                  {done.map((task) => (
+                    <TaskRow
+                      key={task.id}
+                      task={task}
+                      onToggle={onToggle}
+                      onToggleToday={onToggleToday}
+                    />
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </section>
   );
 }
 
@@ -36,20 +282,13 @@ function TaskRow({
         type="button"
         onClick={() => onToggle(task.id)}
         aria-label={task.done ? "Снять отметку" : "Отметить выполненной"}
-        className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-          task.done
-            ? "border-accent bg-accent text-white"
-            : "border-border text-transparent"
-        }`}
       >
-        <IconCheck />
+        <Checkbox done={task.done} />
       </button>
 
       <div className="min-w-0 flex-1">
         <span
-          className={`block text-[15px] ${
-            task.done ? "text-muted line-through" : ""
-          }`}
+          className={`block text-[15px] ${task.done ? "text-muted line-through" : ""}`}
         >
           {task.title}
         </span>
@@ -67,61 +306,5 @@ function TaskRow({
         </svg>
       </button>
     </li>
-  );
-}
-
-export default function TodayScreen({
-  tasks,
-  onToggle,
-  onToggleToday,
-}: {
-  tasks: Task[];
-  onToggle: (id: string) => void;
-  onToggleToday: (id: string) => void;
-}) {
-  const today = new Date().toLocaleDateString("ru-RU", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  });
-
-  const doneCount = tasks.filter((t) => t.done).length;
-  // Невыполненные сверху, выполненные — вниз
-  const sorted = [...tasks].sort((a, b) => Number(a.done) - Number(b.done));
-
-  return (
-    <section className="flex flex-1 flex-col px-5 pt-8">
-      <h1 className="text-2xl font-semibold tracking-tight">Сегодня</h1>
-      <p className="mt-1 text-sm capitalize text-muted">
-        {today}
-        {tasks.length > 0 && (
-          <span className="lowercase">
-            {" "}
-            · {doneCount} из {tasks.length}
-          </span>
-        )}
-      </p>
-
-      {tasks.length === 0 ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center text-muted">
-          <IconTodayLarge />
-          <p className="max-w-xs text-sm">
-            План пуст. Надиктуй мысли на «Захвате» — AI сам предложит план на
-            сегодня. Или нажми ☀️ у задач во «Входящих».
-          </p>
-        </div>
-      ) : (
-        <ul className="mt-4 flex flex-col gap-2 pb-6">
-          {sorted.map((task) => (
-            <TaskRow
-              key={task.id}
-              task={task}
-              onToggle={onToggle}
-              onToggleToday={onToggleToday}
-            />
-          ))}
-        </ul>
-      )}
-    </section>
   );
 }
