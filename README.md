@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ⚡ Ясно — AI-планер дня
 
-## Getting Started
+**Скажи, що в голові — стане ясно, що робити.**
 
-First, run the development server:
+Вивантажуєш хаос думок голосом або текстом → AI розбирає їх на задачі з пріоритетом,
+оцінкою часу та дедлайном → сам збирає реалістичний план на сьогодні → режим «Фокус»
+веде тебе по плану, блок за блоком, до конфеті 🎉
+
+🔗 **Живий застосунок:** https://day-planner-henna-three.vercel.app/
+
+## Наскрізний сценарій
+
+1. **Думки** — brain dump: скажи вголос (розпізнавання мовлення uk-UA) або напиши все підряд
+2. **AI-розбір** — Claude аналізує текст: окремі задачі, пріоритет (важливо/середнє/не терміново),
+   оцінка часу, дедлайн з природної мови («до п'ятниці», «завтра», «ввечері»)
+3. **План на сьогодні** — AI сам відбирає 3–7 справ, які реально варто зробити сьогодні,
+   і показує брифінг дня: скільки задач, скільки часу, з чого почати
+4. **Фокус** — веде по плану пачками за пріоритетом: спочатку важливе → потім середнє →
+   потім дрібниці. Прогрес-бар, мікро-свята між блоками, конфеті у фіналі
+
+## Продуктові рішення
+
+- **AI — ядро, не декорація:** розбір, пріоритезація, план дня і брифінг — усе робить AI
+- **Фокус замість списку:** довгий список паралізує; «Ясно» показує лише поточний блок справ
+- **Реалістичний план:** AI свідомо обмежує план на день (3–7 задач), решта — у «Вхідних»
+- **Акаунт і синхронізація:** вхід через Google (Supabase Auth), задачі в хмарі (RLS —
+  кожен бачить лише свої), працює на всіх пристроях
+- **Mobile-first:** великі тач-зони, темна тема, PWA — можна додати на екран «Додому»
+
+## Стек
+
+- **Next.js 16** (App Router) + React 19 + Tailwind CSS v4 + TypeScript
+- **Supabase** — Google OAuth + Postgres із Row Level Security
+- **Claude Haiku 4.5** (через OpenRouter) — серверний розбір задач (`app/api/parse`),
+  ключ живе тільки на сервері
+- **Web Speech API** — голосовий ввід українською, без зовнішніх сервісів
+- **Vercel** — деплой, авто-оновлення з кожним push
+
+## Запуск локально
 
 ```bash
+npm install
+# .env.local: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, OPENROUTER_API_KEY
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
