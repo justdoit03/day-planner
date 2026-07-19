@@ -85,7 +85,7 @@ export default function CaptureScreen({
       />
 
       {(error || speech.error) && (
-        <p className="mb-2 rounded-xl bg-accent/15 px-4 py-2 text-sm text-accent">
+        <p className="mb-2 rounded-xl bg-danger/15 px-4 py-2 text-sm text-danger">
           {error || speech.error}
         </p>
       )}
@@ -97,7 +97,7 @@ export default function CaptureScreen({
           disabled={!canSend}
           className={`flex h-14 w-full items-center justify-center gap-2 rounded-2xl text-base font-semibold transition-all ${
             canSend || loading
-              ? "bg-accent text-white active:scale-[0.98]"
+              ? "bg-accent text-white shadow-lg shadow-accent/25 active:scale-[0.98]"
               : "bg-surface-2 text-muted"
           }`}
         >

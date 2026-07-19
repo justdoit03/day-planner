@@ -41,7 +41,7 @@ function TaskRow({
   onToggleToday: (id: string) => void;
 }) {
   return (
-    <li className="flex items-start gap-3 rounded-2xl bg-surface px-4 py-3.5">
+    <li className="flex items-start gap-3 rounded-2xl border border-white/[0.05] bg-surface px-4 py-3.5">
       <button
         type="button"
         onClick={() => onToggle(task.id)}

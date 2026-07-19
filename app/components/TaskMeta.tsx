@@ -1,7 +1,7 @@
 import type { Task } from "../lib/useTasks";
 
 const priorityColor: Record<string, string> = {
-  high: "bg-accent",
+  high: "bg-danger",
   medium: "bg-amber-400",
   low: "bg-zinc-500",
 };

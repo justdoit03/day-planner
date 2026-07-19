@@ -17,6 +17,23 @@ function tierOf(t: Task): Tier {
   return (t.priority ?? "medium") as Tier;
 }
 
+function pluralTask(n: number): string {
+  const a = n % 10;
+  const b = n % 100;
+  if (a === 1 && b !== 11) return "задача";
+  if (a >= 2 && a <= 4 && (b < 10 || b >= 20)) return "задачи";
+  return "задач";
+}
+
+function formatTotal(min: number): string {
+  if (min <= 0) return "";
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  if (h && m) return `~${h} ч ${m} мин`;
+  if (h) return `~${h} ч`;
+  return `~${m} мин`;
+}
+
 function IconCheck() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -114,7 +131,7 @@ export default function TodayScreen({
           <button
             type="button"
             onClick={() => setFocus(false)}
-            className="mt-2 h-12 rounded-2xl bg-accent px-8 text-base font-semibold text-white active:scale-[0.98]"
+            className="mt-2 h-12 rounded-2xl bg-accent px-8 text-base font-semibold text-white shadow-lg shadow-accent/25 active:scale-[0.98]"
           >
             Готово
           </button>
@@ -167,7 +184,7 @@ export default function TodayScreen({
               <button
                 type="button"
                 onClick={() => onToggle(task.id)}
-                className="flex w-full items-start gap-3 rounded-2xl bg-surface px-4 py-4 text-left transition-transform active:scale-[0.99]"
+                className="flex w-full items-start gap-3 rounded-2xl border border-white/[0.05] bg-surface px-4 py-4 text-left transition-transform active:scale-[0.99]"
               >
                 <Checkbox done={false} />
                 <div className="min-w-0 flex-1">
@@ -206,11 +223,43 @@ export default function TodayScreen({
         </div>
       ) : (
         <>
+          {/* AI-брифинг дня */}
+          {(() => {
+            if (undone.length === 0) {
+              return (
+                <div className="mt-5 flex items-start gap-3 rounded-2xl border border-accent/20 bg-accent/[0.08] px-4 py-3.5">
+                  <span className="text-lg leading-none">🎉</span>
+                  <p className="text-sm leading-relaxed">
+                    Всё на сегодня сделано. Красавчик — можно выдохнуть.
+                  </p>
+                </div>
+              );
+            }
+            const totalMin = undone.reduce(
+              (s, t) => s + (t.estimateMin ?? 0),
+              0
+            );
+            const top =
+              undone.find((t) => tierOf(t) === "high") ??
+              undone.find((t) => tierOf(t) === "medium") ??
+              undone[0];
+            const time = formatTotal(totalMin);
+            return (
+              <div className="mt-5 flex items-start gap-3 rounded-2xl border border-accent/20 bg-accent/[0.08] px-4 py-3.5">
+                <span className="text-lg leading-none">✨</span>
+                <p className="text-sm leading-relaxed">
+                  На сегодня {undone.length} {pluralTask(undone.length)}
+                  {time ? ` · ${time}` : ""}. Начни с «{top.title}».
+                </p>
+              </div>
+            );
+          })()}
+
           {undone.length > 0 && (
             <button
               type="button"
               onClick={() => setFocus(true)}
-              className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-base font-semibold text-white transition-transform active:scale-[0.98]"
+              className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-base font-semibold text-white shadow-lg shadow-accent/25 transition-transform active:scale-[0.98]"
             >
               <IconBolt />
               Фокус — вести по плану
@@ -277,7 +326,7 @@ function TaskRow({
   onToggleToday: (id: string) => void;
 }) {
   return (
-    <li className="flex items-start gap-3 rounded-2xl bg-surface px-4 py-3.5">
+    <li className="flex items-start gap-3 rounded-2xl border border-white/[0.05] bg-surface px-4 py-3.5">
       <button
         type="button"
         onClick={() => onToggle(task.id)}
