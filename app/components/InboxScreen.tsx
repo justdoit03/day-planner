@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { Task } from "../lib/useTasks";
 import TaskMeta from "./TaskMeta";
 
@@ -108,6 +109,7 @@ export default function InboxScreen({
   onToggleToday,
   onEdit,
   onAdd,
+  onClearDone,
 }: {
   tasks: Task[];
   onToggle: (id: string) => void;
@@ -115,17 +117,44 @@ export default function InboxScreen({
   onToggleToday: (id: string) => void;
   onEdit: (task: Task) => void;
   onAdd: () => void;
+  onClearDone: () => void;
 }) {
   const doneCount = tasks.filter((t) => t.done).length;
+  const [confirmClear, setConfirmClear] = useState(false);
 
   return (
     <section className="flex flex-1 flex-col px-5 pt-8">
-      <h1 className="text-2xl font-semibold tracking-tight">Вхідні</h1>
-      <p className="mt-1 text-sm text-muted">
-        {tasks.length === 0
-          ? "Сюди потраплять задачі з твоїх думок"
-          : `Задач: ${tasks.length} · виконано: ${doneCount}`}
-      </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Вхідні</h1>
+          <p className="mt-1 text-sm text-muted">
+            {tasks.length === 0
+              ? "Сюди потраплять задачі з твоїх думок"
+              : `Задач: ${tasks.length} · виконано: ${doneCount}`}
+          </p>
+        </div>
+        {doneCount > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              if (confirmClear) {
+                onClearDone();
+                setConfirmClear(false);
+              } else {
+                setConfirmClear(true);
+                setTimeout(() => setConfirmClear(false), 3000);
+              }
+            }}
+            className={`mt-1 shrink-0 rounded-full px-3.5 py-2 text-xs font-medium transition-colors ${
+              confirmClear
+                ? "bg-danger/20 text-danger"
+                : "border border-white/[0.07] text-muted active:bg-surface"
+            }`}
+          >
+            {confirmClear ? `Видалити ${doneCount}?` : "🧹 Очистити виконані"}
+          </button>
+        )}
+      </div>
 
       {tasks.length === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center text-muted">

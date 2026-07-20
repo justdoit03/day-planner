@@ -158,6 +158,14 @@ export function useTasks(userId: string | null) {
     );
   }
 
+  // Удалить все выполненные задачи разом
+  async function clearDone() {
+    const ids = tasks.filter((t) => t.done).map((t) => t.id);
+    if (ids.length === 0) return;
+    setTasks((prev) => prev.filter((t) => !t.done));
+    await supabase.from("tasks").delete().in("id", ids);
+  }
+
   // Ручное создание задачи (шит «Нова задача»)
   async function addManual(f: TaskFields): Promise<boolean> {
     const { data, error } = await supabase
@@ -211,6 +219,7 @@ export function useTasks(userId: string | null) {
     update,
     toggle,
     remove,
+    clearDone,
     undoDelete,
     pendingDelete,
     toggleToday,

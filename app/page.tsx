@@ -71,6 +71,7 @@ export default function Home() {
     update,
     toggle,
     remove,
+    clearDone,
     undoDelete,
     pendingDelete,
     toggleToday,
@@ -177,6 +178,7 @@ export default function Home() {
               onToggleToday={toggleToday}
               onEdit={(task) => setEditor({ open: true, task })}
               onAdd={() => setEditor({ open: true, task: null })}
+              onClearDone={clearDone}
             />
           )}
           {tab === "today" && (
