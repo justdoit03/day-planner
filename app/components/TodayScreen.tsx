@@ -312,34 +312,33 @@ export default function TodayScreen({
         </>
       ) : (
         <>
-          {/* 🐸 Жаба дня — найважче зробити першим */}
-          {frog && (
-            <button
-              type="button"
-              onClick={() => onToggle(frog.id)}
-              className="mt-5 flex w-full items-center gap-3 rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/[0.16] to-accent/[0.03] px-4 py-3.5 text-left transition-transform active:scale-[0.99]"
-            >
-              <span className="text-2xl leading-none">🐸</span>
-              <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-semibold uppercase tracking-wide text-accent">
-                  Жаба дня
-                </p>
-                <p className="truncate text-[15px] font-medium">{frog.title}</p>
-                <p className="text-xs text-muted">
-                  Найважче — зроби першим, і день піде легше
-                </p>
-              </div>
-            </button>
-          )}
-
-          {/* ✨ AI-брифинг */}
-          <div className="mt-3 flex items-start gap-3 rounded-2xl border border-accent/20 bg-accent/[0.08] px-4 py-3.5">
-            <span className="text-lg leading-none">✨</span>
-            <p className="text-sm leading-relaxed">
-              На сьогодні {undone.length} {pluralTask(undone.length)}
-              {timeStr ? ` · ${timeStr}` : ""}.
-              {!frog ? ` Почни з «${briefTop.title}».` : " Ти впораєшся 💪"}
+          {/* ✨ План дня + 🐸 Жаба дня — один блок */}
+          <div className="mt-5 rounded-2xl border border-accent/20 bg-accent/[0.08] px-4 py-3.5">
+            <p className="flex items-start gap-3 text-sm leading-relaxed">
+              <span className="text-lg leading-none">✨</span>
+              <span>
+                На сьогодні {undone.length} {pluralTask(undone.length)}
+                {timeStr ? ` · ${timeStr}` : ""}.
+                {!frog ? ` Почни з «${briefTop.title}».` : ""}
+              </span>
             </p>
+            {frog && (
+              <button
+                type="button"
+                onClick={() => onToggle(frog.id)}
+                className="mt-3 flex w-full items-center gap-3 rounded-xl border border-accent/25 bg-gradient-to-br from-accent/[0.14] to-transparent px-3 py-2.5 text-left transition-transform active:scale-[0.99]"
+              >
+                <span className="text-xl leading-none">🐸</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[11px] font-semibold uppercase tracking-wide text-accent">
+                    Жаба дня — зроби першою
+                  </span>
+                  <span className="block truncate text-[15px] font-medium">
+                    {frog.title}
+                  </span>
+                </span>
+              </button>
+            )}
           </div>
 
           {/* ⚖️ 1-3-5: підказка про перевантаження (AI радить, вирішуєш ти) */}
