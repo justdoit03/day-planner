@@ -43,6 +43,9 @@ export default function TaskMeta({ task }: { task: Task }) {
         <span className={`h-2 w-2 rounded-full ${dot}`} />
         {label}
       </span>
+      {task.dueTime && (
+        <span className="font-medium text-foreground/80">🕒 {task.dueTime}</span>
+      )}
       {estimate && <span>⏱ {estimate}</span>}
       {due && (
         <span

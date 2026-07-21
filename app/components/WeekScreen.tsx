@@ -87,6 +87,10 @@ export default function WeekScreen({
     const items = tasks
       .filter((t) => !t.done && t.dueDate === iso)
       .sort((a, b) => {
+        // сначала задачи со временем (по возрастанию), потом без времени по приоритету
+        if (a.dueTime && b.dueTime && a.dueTime !== b.dueTime)
+          return a.dueTime.localeCompare(b.dueTime);
+        if (!!a.dueTime !== !!b.dueTime) return a.dueTime ? -1 : 1;
         const rank = { high: 0, medium: 1, low: 2 } as const;
         return (
           (rank[a.priority ?? "low"] ?? 3) - (rank[b.priority ?? "low"] ?? 3)

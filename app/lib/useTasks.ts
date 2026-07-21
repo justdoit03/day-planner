@@ -14,6 +14,7 @@ export type Task = {
   priority?: "low" | "medium" | "high";
   estimateMin?: number | null;
   dueDate?: string | null;
+  dueTime?: string | null; // время «HH:MM», на которое назначена задача
 };
 
 // Поля для ручного создания/редактирования задачи.
@@ -22,6 +23,7 @@ export type TaskFields = {
   priority: "low" | "medium" | "high";
   estimateMin: number | null;
   dueDate: string | null;
+  dueTime: string | null;
   today: boolean;
 };
 
@@ -31,6 +33,7 @@ export type ParsedTask = {
   priority: "low" | "medium" | "high";
   estimateMin: number | null;
   dueDate: string | null;
+  dueTime?: string | null;
   forToday?: boolean; // AI предложил взять в план на сегодня
 };
 
@@ -43,6 +46,7 @@ type Row = {
   priority: "low" | "medium" | "high" | null;
   estimate_min: number | null;
   due_date: string | null;
+  due_time: string | null;
   created_at: string;
 };
 
@@ -55,6 +59,7 @@ function fromRow(r: Row): Task {
     priority: r.priority ?? undefined,
     estimateMin: r.estimate_min,
     dueDate: r.due_date,
+    dueTime: r.due_time,
     createdAt: new Date(r.created_at).getTime(),
   };
 }
@@ -91,6 +96,7 @@ export function useTasks(userId: string | null) {
       priority: p.priority,
       estimate_min: p.estimateMin,
       due_date: p.dueDate,
+      due_time: p.dueTime ?? null,
       done: false,
       today: p.forToday === true, // AI сам предложил план на сегодня
     }));
@@ -103,10 +109,16 @@ export function useTasks(userId: string | null) {
   async function toggle(id: string) {
     const t = tasks.find((x) => x.id === id);
     if (!t) return;
+    const nextDone = !t.done;
+    // completed_at — момент выполнения (для стрика и статистики); при снятии — null
+    const completedAt = nextDone ? new Date().toISOString() : null;
     setTasks((prev) =>
-      prev.map((x) => (x.id === id ? { ...x, done: !x.done } : x))
+      prev.map((x) => (x.id === id ? { ...x, done: nextDone } : x))
     );
-    await supabase.from("tasks").update({ done: !t.done }).eq("id", id);
+    await supabase
+      .from("tasks")
+      .update({ done: nextDone, completed_at: completedAt })
+      .eq("id", id);
   }
 
   async function toggleToday(id: string) {
@@ -190,6 +202,7 @@ export function useTasks(userId: string | null) {
         priority: f.priority,
         estimate_min: f.estimateMin,
         due_date: f.dueDate,
+        due_time: f.dueTime,
         today: f.today,
         done: false,
       })
@@ -210,6 +223,7 @@ export function useTasks(userId: string | null) {
               priority: f.priority,
               estimateMin: f.estimateMin,
               dueDate: f.dueDate,
+              dueTime: f.dueTime,
               today: f.today,
             }
           : t
@@ -222,6 +236,7 @@ export function useTasks(userId: string | null) {
         priority: f.priority,
         estimate_min: f.estimateMin,
         due_date: f.dueDate,
+        due_time: f.dueTime,
         today: f.today,
       })
       .eq("id", id);

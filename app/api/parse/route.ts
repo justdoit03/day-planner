@@ -6,6 +6,7 @@ type ParsedTask = {
   priority: "low" | "medium" | "high";
   estimateMin: number | null;
   dueDate: string | null;
+  dueTime: string | null; // время «HH:MM», если указано
   forToday: boolean; // AI решил, что это стоит сделать сегодня
 };
 
@@ -47,12 +48,17 @@ function normalize(tasks: unknown): ParsedTask[] {
         typeof t.dueDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(t.dueDate)
           ? t.dueDate
           : null;
+      const dueTime =
+        typeof t.dueTime === "string" && /^\d{2}:\d{2}$/.test(t.dueTime)
+          ? t.dueTime
+          : null;
       const forToday = t.forToday === true;
       return {
         title: String(t.title).trim(),
         priority,
         estimateMin,
         dueDate,
+        dueTime,
         forToday,
       };
     })
@@ -86,13 +92,15 @@ export async function POST(req: Request) {
     "Ти — парсер задач для планувальника дня. На вхід дається хаотичний текст, " +
     "який користувач надиктував або написав. Розбий його на окремі конкретні задачі.\n" +
     "Відповідай СУВОРО валідним JSON такого вигляду (без markdown, без пояснень, без ```):\n" +
-    '{"tasks":[{"title":"...","priority":"low|medium|high","estimateMin":30,"dueDate":"2026-07-20","forToday":true}]}\n' +
+    '{"tasks":[{"title":"...","priority":"low|medium|high","estimateMin":30,"dueDate":"2026-07-20","dueTime":"15:00","forToday":true}]}\n' +
     "Правила щодо полів:\n" +
     "- title: коротке зрозуміле формулювання мовою користувача (за замовчуванням українською), " +
     "з великої літери, без зайвих слів.\n" +
     "- priority: 'high' — термінове/важливе або з близьким дедлайном; 'medium' — звичайне; 'low' — дрібниця.\n" +
     "- estimateMin: оцінка часу в хвилинах (ціле число) або null, якщо оцінити неможливо.\n" +
     "- dueDate: дата у форматі YYYY-MM-DD, якщо в тексті є строк ('до п'ятниці', 'завтра', 'до 20-го'); інакше null.\n" +
+    "- dueTime: час доби у форматі 24h HH:MM, ЛИШЕ якщо в тексті явно вказано час " +
+    "('о 15:00', 'о 9 ранку' → '09:00', 'о пів на сьому' → '18:30', 'ввечері' без точного часу → null); інакше null.\n" +
     "- forToday: true ЛИШЕ для того, що реально важливо і терміново зробити саме сьогодні " +
     "(термінове; дедлайн сьогодні або прострочений; явні 'сьогодні', 'зараз', 'ввечері', 'до кінця дня'). " +
     "Це реалістичний план на день — зазвичай 3–7 задач, НЕ більше. Усе інше forToday=false " +

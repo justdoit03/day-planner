@@ -24,6 +24,7 @@ export default function TaskEditorSheet({
   const [priority, setPriority] = useState<TaskFields["priority"]>("medium");
   const [estimate, setEstimate] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [dueTime, setDueTime] = useState("");
   const [today, setToday] = useState(false);
 
   // Заполняем поля при каждом открытии
@@ -33,6 +34,7 @@ export default function TaskEditorSheet({
     setPriority(task?.priority ?? "medium");
     setEstimate(task?.estimateMin ? String(task.estimateMin) : "");
     setDueDate(task?.dueDate ?? "");
+    setDueTime(task?.dueTime ?? "");
     setToday(task?.today ?? false);
   }, [open, task]);
 
@@ -48,6 +50,7 @@ export default function TaskEditorSheet({
       priority,
       estimateMin: Number.isFinite(est) && est > 0 ? est : null,
       dueDate: dueDate || null,
+      dueTime: dueTime || null,
       today,
     });
     onClose();
@@ -98,17 +101,7 @@ export default function TaskEditorSheet({
 
         <div className="mt-4 grid grid-cols-2 gap-3">
           <div>
-            <label className="mb-1.5 block text-xs text-muted">Час, хв</label>
-            <input
-              value={estimate}
-              onChange={(e) => setEstimate(e.target.value.replace(/\D/g, ""))}
-              inputMode="numeric"
-              placeholder="30"
-              className="h-12 w-full rounded-xl border border-white/[0.05] bg-surface-2 px-4 text-base placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/40"
-            />
-          </div>
-          <div>
-            <label className="mb-1.5 block text-xs text-muted">Дедлайн</label>
+            <label className="mb-1.5 block text-xs text-muted">Дата</label>
             <input
               type="date"
               value={dueDate}
@@ -116,6 +109,28 @@ export default function TaskEditorSheet({
               className="h-12 w-full rounded-xl border border-white/[0.05] bg-surface-2 px-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 [color-scheme:dark]"
             />
           </div>
+          <div>
+            <label className="mb-1.5 block text-xs text-muted">Час</label>
+            <input
+              type="time"
+              value={dueTime}
+              onChange={(e) => setDueTime(e.target.value)}
+              className="h-12 w-full rounded-xl border border-white/[0.05] bg-surface-2 px-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 [color-scheme:dark]"
+            />
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <label className="mb-1.5 block text-xs text-muted">
+            Тривалість, хв
+          </label>
+          <input
+            value={estimate}
+            onChange={(e) => setEstimate(e.target.value.replace(/\D/g, ""))}
+            inputMode="numeric"
+            placeholder="30"
+            className="h-12 w-full rounded-xl border border-white/[0.05] bg-surface-2 px-4 text-base placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/40"
+          />
         </div>
 
         <button
