@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import type { Task } from "../lib/useTasks";
 import TaskMeta from "./TaskMeta";
 import Confetti from "./Confetti";
+import { nowHHMM } from "../lib/dates";
 
 const TIERS = ["high", "medium", "low"] as const;
 type Tier = (typeof TIERS)[number];
@@ -16,6 +17,21 @@ const tierInfo: Record<Tier, { emoji: string; label: string }> = {
 
 function tierOf(t: Task): Tier {
   return (t.priority ?? "medium") as Tier;
+}
+
+const priorityRank: Record<Tier, number> = { high: 0, medium: 1, low: 2 };
+
+// 🐸 «Жаба дня» (Eat the Frog): найважче/найважливіше — зробити першим.
+// Серед невиконаних: спершу вищий пріоритет, потім довша задача, потім раніший час.
+function pickFrog(undone: Task[]): Task | null {
+  if (undone.length < 2) return null;
+  return [...undone].sort((a, b) => {
+    const r = priorityRank[tierOf(a)] - priorityRank[tierOf(b)];
+    if (r !== 0) return r;
+    const e = (b.estimateMin ?? 0) - (a.estimateMin ?? 0);
+    if (e !== 0) return e;
+    return (a.dueTime ?? "99:99").localeCompare(b.dueTime ?? "99:99");
+  })[0];
 }
 
 function pluralTask(n: number): string {
@@ -205,7 +221,27 @@ export default function TodayScreen({
     );
   }
 
-  // ---------- ОБЫЧНЫЙ ВИД (группировка) ----------
+  // ---------- ОБЫЧНЫЙ ВИД: РОЗУМНИЙ ПЛАН ДНЯ ----------
+  // 🐸 Жаба дня (Eat the Frog)
+  const frog = pickFrog(undone);
+  // ⚖️ 1-3-5 / MIT: чи не перевантажений план
+  const big = undone.filter((t) => tierOf(t) === "high").length;
+  const mid = undone.filter((t) => tierOf(t) === "medium").length;
+  const small = undone.filter((t) => tierOf(t) === "low").length;
+  const overloaded = big > 1 || mid > 3 || small > 5 || undone.length > 9;
+  // 📋 Лента дня (Time Blocking): зі часом — по годинах, решта — по тирах
+  const timed = undone
+    .filter((t) => t.dueTime)
+    .sort((a, b) => (a.dueTime ?? "").localeCompare(b.dueTime ?? ""));
+  const untimed = undone.filter((t) => !t.dueTime);
+  const now = nowHHMM();
+  const nowIdx = timed.findIndex((t) => (t.dueTime ?? "") >= now);
+  const nowMarkerAt = nowIdx === -1 ? timed.length : nowIdx;
+  // ✨ Брифинг: обсяг + час (без дублювання «почни з» — це робить Жаба)
+  const totalMin = undone.reduce((s, t) => s + (t.estimateMin ?? 0), 0);
+  const timeStr = formatTotal(totalMin);
+  const briefTop = undone[0];
+
   return (
     <section className="flex flex-1 flex-col px-5 pt-8">
       <h1 className="text-2xl font-semibold tracking-tight">Сьогодні</h1>
@@ -248,76 +284,140 @@ export default function TodayScreen({
             план на сьогодні. Або натисни ☀️ біля задач у «Вхідних».
           </p>
         </div>
+      ) : undone.length === 0 ? (
+        <>
+          <div className="mt-5 flex items-start gap-3 rounded-2xl border border-accent/20 bg-accent/[0.08] px-4 py-3.5">
+            <span className="text-lg leading-none">🎉</span>
+            <p className="text-sm leading-relaxed">
+              Усе на сьогодні зроблено. Красунчик — можна видихнути.
+            </p>
+          </div>
+          {done.length > 0 && (
+            <div className="mt-5 pb-6">
+              <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted">
+                Зроблено · {done.length}
+              </div>
+              <ul className="flex flex-col gap-2">
+                {done.map((task) => (
+                  <TaskRow
+                    key={task.id}
+                    task={task}
+                    onToggle={onToggle}
+                    onToggleToday={onToggleToday}
+                  />
+                ))}
+              </ul>
+            </div>
+          )}
+        </>
       ) : (
         <>
-          {/* AI-брифинг дня */}
-          {(() => {
-            if (undone.length === 0) {
-              return (
-                <div className="mt-5 flex items-start gap-3 rounded-2xl border border-accent/20 bg-accent/[0.08] px-4 py-3.5">
-                  <span className="text-lg leading-none">🎉</span>
-                  <p className="text-sm leading-relaxed">
-                    Усе на сьогодні зроблено. Красунчик — можна видихнути.
-                  </p>
-                </div>
-              );
-            }
-            const totalMin = undone.reduce(
-              (s, t) => s + (t.estimateMin ?? 0),
-              0
-            );
-            const top =
-              undone.find((t) => tierOf(t) === "high") ??
-              undone.find((t) => tierOf(t) === "medium") ??
-              undone[0];
-            const time = formatTotal(totalMin);
-            return (
-              <div className="mt-5 flex items-start gap-3 rounded-2xl border border-accent/20 bg-accent/[0.08] px-4 py-3.5">
-                <span className="text-lg leading-none">✨</span>
-                <p className="text-sm leading-relaxed">
-                  На сьогодні {undone.length} {pluralTask(undone.length)}
-                  {time ? ` · ${time}` : ""}. Почни з «{top.title}».
-                </p>
-              </div>
-            );
-          })()}
-
-          {undone.length > 0 && (
+          {/* 🐸 Жаба дня — найважче зробити першим */}
+          {frog && (
             <button
               type="button"
-              onClick={() => setFocus(true)}
-              className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-base font-semibold text-white shadow-lg shadow-accent/25 transition-transform active:scale-[0.98]"
+              onClick={() => onToggle(frog.id)}
+              className="mt-5 flex w-full items-center gap-3 rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/[0.16] to-accent/[0.03] px-4 py-3.5 text-left transition-transform active:scale-[0.99]"
             >
-              <IconBolt />
-              Фокус — веди мене по плану
+              <span className="text-2xl leading-none">🐸</span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-accent">
+                  Жаба дня
+                </p>
+                <p className="truncate text-[15px] font-medium">{frog.title}</p>
+                <p className="text-xs text-muted">
+                  Найважче — зроби першим, і день піде легше
+                </p>
+              </div>
             </button>
           )}
 
-          <div className="mt-5 flex flex-col gap-5 pb-6">
-            {TIERS.map((tier) => {
-              const items = undone.filter((t) => tierOf(t) === tier);
-              if (items.length === 0) return null;
-              const info = tierInfo[tier];
-              return (
-                <div key={tier}>
-                  <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted">
-                    <span>{info.emoji}</span>
-                    {info.label}
-                    <span className="text-muted/60">· {items.length}</span>
-                  </div>
-                  <ul className="flex flex-col gap-2">
-                    {items.map((task) => (
-                      <TaskRow
-                        key={task.id}
-                        task={task}
-                        onToggle={onToggle}
-                        onToggleToday={onToggleToday}
-                      />
-                    ))}
-                  </ul>
+          {/* ✨ AI-брифинг */}
+          <div className="mt-3 flex items-start gap-3 rounded-2xl border border-accent/20 bg-accent/[0.08] px-4 py-3.5">
+            <span className="text-lg leading-none">✨</span>
+            <p className="text-sm leading-relaxed">
+              На сьогодні {undone.length} {pluralTask(undone.length)}
+              {timeStr ? ` · ${timeStr}` : ""}.
+              {!frog ? ` Почни з «${briefTop.title}».` : " Ти впораєшся 💪"}
+            </p>
+          </div>
+
+          {/* ⚖️ 1-3-5: підказка про перевантаження (AI радить, вирішуєш ти) */}
+          {overloaded && (
+            <div className="mt-3 flex items-start gap-3 rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3">
+              <span className="text-base leading-none">⚖️</span>
+              <p className="text-xs leading-relaxed text-muted">
+                План амбітний — {undone.length} задач. Правило{" "}
+                <span className="font-medium text-foreground">1-3-5</span> радить:
+                1 велика, 3 середні та 5 дрібних справ на день. Може, щось
+                перенести на завтра?
+              </p>
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={() => setFocus(true)}
+            className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-base font-semibold text-white shadow-lg shadow-accent/25 transition-transform active:scale-[0.98]"
+          >
+            <IconBolt />
+            Фокус — веди мене по плану
+          </button>
+
+          <div className="mt-6 flex flex-col gap-6 pb-6">
+            {/* 📋 Розклад дня — задачи со временем */}
+            {timed.length > 0 && (
+              <div>
+                <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted">
+                  <span>📋</span>
+                  Розклад дня
                 </div>
-              );
-            })}
+                <ul className="flex flex-col">
+                  {timed.map((task, i) => (
+                    <Fragment key={task.id}>
+                      {i === nowMarkerAt && <NowMarker now={now} />}
+                      <TimelineRow task={task} onToggle={onToggle} />
+                    </Fragment>
+                  ))}
+                  {nowMarkerAt === timed.length && <NowMarker now={now} />}
+                </ul>
+              </div>
+            )}
+
+            {/* Задачи без времени — по приоритету */}
+            {untimed.length > 0 && (
+              <div className="flex flex-col gap-5">
+                {timed.length > 0 && (
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted">
+                    Будь-коли
+                  </div>
+                )}
+                {TIERS.map((tier) => {
+                  const items = untimed.filter((t) => tierOf(t) === tier);
+                  if (items.length === 0) return null;
+                  const info = tierInfo[tier];
+                  return (
+                    <div key={tier}>
+                      <div className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted">
+                        <span>{info.emoji}</span>
+                        {info.label}
+                        <span className="text-muted/60">· {items.length}</span>
+                      </div>
+                      <ul className="flex flex-col gap-2">
+                        {items.map((task) => (
+                          <TaskRow
+                            key={task.id}
+                            task={task}
+                            onToggle={onToggle}
+                            onToggleToday={onToggleToday}
+                          />
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
             {done.length > 0 && (
               <div>
@@ -340,6 +440,59 @@ export default function TodayScreen({
         </>
       )}
     </section>
+  );
+}
+
+// Ряд ленты дня: час зліва, коннектор із точкою, картка справа
+function TimelineRow({
+  task,
+  onToggle,
+}: {
+  task: Task;
+  onToggle: (id: string) => void;
+}) {
+  return (
+    <li className="flex gap-3">
+      <span className="w-11 shrink-0 pt-3.5 text-right text-xs font-semibold text-accent">
+        {task.dueTime}
+      </span>
+      <div className="relative flex-1 border-l-2 border-white/[0.06] pb-2 pl-4">
+        <span className="absolute -left-[5px] top-4 h-2 w-2 rounded-full bg-accent" />
+        <button
+          type="button"
+          onClick={() => onToggle(task.id)}
+          className="flex w-full items-start gap-3 rounded-2xl border border-white/[0.05] bg-surface px-4 py-3 text-left transition-transform active:scale-[0.99]"
+        >
+          <Checkbox done={task.done} />
+          <div className="min-w-0 flex-1">
+            <span
+              className={`block text-[15px] ${task.done ? "text-muted line-through" : ""}`}
+            >
+              {task.title}
+            </span>
+            {!task.done && <TaskMeta task={task} hideTime />}
+          </div>
+        </button>
+      </div>
+    </li>
+  );
+}
+
+// Тонкий маркер «зараз HH:MM» у стрічці дня
+function NowMarker({ now }: { now: string }) {
+  return (
+    <li className="flex items-center gap-3 py-1.5">
+      <span className="w-11 shrink-0 text-right text-[11px] font-semibold text-danger">
+        {now}
+      </span>
+      <div className="flex flex-1 items-center gap-2 pl-4">
+        <span className="h-2 w-2 rounded-full bg-danger" />
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-danger">
+          зараз
+        </span>
+        <span className="h-px flex-1 bg-danger/25" />
+      </div>
+    </li>
   );
 }
 

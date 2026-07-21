@@ -29,7 +29,14 @@ function formatDue(date: string | null | undefined): string | null {
 }
 
 // Строка с приоритетом, оценкой времени и дедлайном под названием задачи.
-export default function TaskMeta({ task }: { task: Task }) {
+// hideTime — скрыть время «🕒 HH:MM» (напр. в ленте дня, где время слева).
+export default function TaskMeta({
+  task,
+  hideTime = false,
+}: {
+  task: Task;
+  hideTime?: boolean;
+}) {
   const estimate = formatEstimate(task.estimateMin);
   const due = formatDue(task.dueDate);
   const dot = priorityColor[task.priority ?? "low"] ?? "bg-zinc-500";
@@ -43,7 +50,7 @@ export default function TaskMeta({ task }: { task: Task }) {
         <span className={`h-2 w-2 rounded-full ${dot}`} />
         {label}
       </span>
-      {task.dueTime && (
+      {!hideTime && task.dueTime && (
         <span className="font-medium text-foreground/80">🕒 {task.dueTime}</span>
       )}
       {estimate && <span>⏱ {estimate}</span>}

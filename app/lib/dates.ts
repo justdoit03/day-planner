@@ -20,6 +20,14 @@ export function isoInDays(n: number): string {
   return `${y}-${m}-${day}`;
 }
 
+// Текущее время суток как "HH:MM" (для маркера «зараз» в ленте дня)
+export function nowHHMM(): string {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, "0")}:${String(
+    d.getMinutes()
+  ).padStart(2, "0")}`;
+}
+
 export function isOverdue(due?: string | null): boolean {
   if (!due) return false;
   return due < todayISO();
