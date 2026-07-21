@@ -78,10 +78,14 @@ export default function TodayScreen({
   tasks,
   onToggle,
   onToggleToday,
+  dueSuggestCount,
+  onPlanDueToday,
 }: {
   tasks: Task[];
   onToggle: (id: string) => void;
   onToggleToday: (id: string) => void;
+  dueSuggestCount: number;
+  onPlanDueToday: () => void;
 }) {
   const [focus, setFocus] = useState(false);
 
@@ -214,6 +218,27 @@ export default function TodayScreen({
           </span>
         )}
       </p>
+
+      {/* Розумний ранок: задачи с дедлайном на сегодня/просроченные, ещё не в плане */}
+      {dueSuggestCount > 0 && (
+        <div className="mt-5 flex items-center gap-3 rounded-2xl border border-amber-400/25 bg-amber-400/[0.08] px-4 py-3.5">
+          <span className="text-xl leading-none">🌅</span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium">Розумний ранок</p>
+            <p className="text-xs text-muted">
+              {dueSuggestCount} {pluralTask(dueSuggestCount)} із дедлайном на
+              сьогодні ще не в плані
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onPlanDueToday}
+            className="shrink-0 rounded-full bg-amber-400/20 px-4 py-2 text-xs font-semibold text-amber-400 transition-transform active:scale-95"
+          >
+            Додати
+          </button>
+        </div>
+      )}
 
       {total === 0 ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center text-muted">

@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 
-export type TabKey = "capture" | "inbox" | "today";
+export type TabKey = "capture" | "inbox" | "today" | "week";
 
 function IconCapture() {
   return (
@@ -32,10 +32,21 @@ function IconToday() {
   );
 }
 
+function IconWeek() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" />
+      <path d="M16 2v4M8 2v4M3 10h18" />
+      <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01" />
+    </svg>
+  );
+}
+
 const tabs: { key: TabKey; label: string; icon: ReactNode }[] = [
   { key: "capture", label: "Думки", icon: <IconCapture /> },
   { key: "inbox", label: "Вхідні", icon: <IconInbox /> },
   { key: "today", label: "Сьогодні", icon: <IconToday /> },
+  { key: "week", label: "Тиждень", icon: <IconWeek /> },
 ];
 
 export default function TabBar({

@@ -1,4 +1,5 @@
 import type { Task } from "../lib/useTasks";
+import { isOverdue, isDueToday } from "../lib/dates";
 
 const priorityColor: Record<string, string> = {
   high: "bg-danger",
@@ -33,6 +34,8 @@ export default function TaskMeta({ task }: { task: Task }) {
   const due = formatDue(task.dueDate);
   const dot = priorityColor[task.priority ?? "low"] ?? "bg-zinc-500";
   const label = priorityLabel[task.priority ?? "low"] ?? "Не терміново";
+  const overdue = isOverdue(task.dueDate);
+  const dueToday = isDueToday(task.dueDate);
 
   return (
     <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
@@ -41,7 +44,19 @@ export default function TaskMeta({ task }: { task: Task }) {
         {label}
       </span>
       {estimate && <span>⏱ {estimate}</span>}
-      {due && <span>📅 {due}</span>}
+      {due && (
+        <span
+          className={
+            overdue
+              ? "font-medium text-danger"
+              : dueToday
+                ? "font-medium text-amber-400"
+                : ""
+          }
+        >
+          {overdue ? "⚠️" : "📅"} {overdue ? `${due} · прострочено` : due}
+        </span>
+      )}
     </div>
   );
 }

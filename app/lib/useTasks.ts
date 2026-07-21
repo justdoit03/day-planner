@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "./supabase";
+import { isDueTodayOrOverdue } from "./dates";
 
 // Схема задачи — «контракт» между интерфейсом и AI.
 export type Task = {
@@ -158,6 +159,20 @@ export function useTasks(userId: string | null) {
     );
   }
 
+  // «Розумний ранок»: собрать в план на сегодня все задачи, у которых дедлайн
+  // сегодня или уже прошёл (и которые ещё не в плане и не выполнены).
+  async function planDueToday(): Promise<number> {
+    const ids = tasks
+      .filter((t) => !t.done && !t.today && isDueTodayOrOverdue(t.dueDate))
+      .map((t) => t.id);
+    if (ids.length === 0) return 0;
+    setTasks((prev) =>
+      prev.map((t) => (ids.includes(t.id) ? { ...t, today: true } : t))
+    );
+    await supabase.from("tasks").update({ today: true }).in("id", ids);
+    return ids.length;
+  }
+
   // Удалить все выполненные задачи разом
   async function clearDone() {
     const ids = tasks.filter((t) => t.done).map((t) => t.id);
@@ -220,6 +235,7 @@ export function useTasks(userId: string | null) {
     toggle,
     remove,
     clearDone,
+    planDueToday,
     undoDelete,
     pendingDelete,
     toggleToday,

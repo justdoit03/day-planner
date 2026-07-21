@@ -7,11 +7,13 @@ import TabBar, { type TabKey } from "./components/TabBar";
 import CaptureScreen from "./components/CaptureScreen";
 import InboxScreen from "./components/InboxScreen";
 import TodayScreen from "./components/TodayScreen";
+import WeekScreen from "./components/WeekScreen";
 import LoginScreen from "./components/LoginScreen";
 import Onboarding from "./components/Onboarding";
 import ProfileSheet from "./components/ProfileSheet";
 import TaskEditorSheet from "./components/TaskEditorSheet";
 import { useTasks, type Task, type TaskFields } from "./lib/useTasks";
+import { isDueTodayOrOverdue } from "./lib/dates";
 
 export default function Home() {
   const [tab, setTab] = useState<TabKey>("capture");
@@ -72,6 +74,7 @@ export default function Home() {
     toggle,
     remove,
     clearDone,
+    planDueToday,
     undoDelete,
     pendingDelete,
     toggleToday,
@@ -110,6 +113,10 @@ export default function Home() {
   }
 
   const todayTasks = tasks.filter((t) => t.today);
+  // Для «Розумного ранку»: задачи с дедлайном сегодня/просроченные, ещё не в плане
+  const dueSuggestCount = tasks.filter(
+    (t) => !t.done && !t.today && isDueTodayOrOverdue(t.dueDate)
+  ).length;
 
   // Ждём проверку сессии, чтобы не мигал экран входа
   if (!authReady) {
@@ -186,8 +193,11 @@ export default function Home() {
               tasks={todayTasks}
               onToggle={toggle}
               onToggleToday={toggleToday}
+              dueSuggestCount={dueSuggestCount}
+              onPlanDueToday={planDueToday}
             />
           )}
+          {tab === "week" && <WeekScreen tasks={tasks} onToggle={toggle} />}
         </div>
       </main>
       <TaskEditorSheet
