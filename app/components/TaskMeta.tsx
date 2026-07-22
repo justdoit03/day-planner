@@ -3,8 +3,8 @@ import { isOverdue, isDueToday } from "../lib/dates";
 
 const priorityColor: Record<string, string> = {
   high: "bg-danger",
-  medium: "bg-amber-400",
-  low: "bg-zinc-500",
+  medium: "bg-amber-500",
+  low: "bg-zinc-400",
 };
 
 const priorityLabel: Record<string, string> = {
@@ -60,7 +60,7 @@ export default function TaskMeta({
             overdue
               ? "font-medium text-danger"
               : dueToday
-                ? "font-medium text-amber-400"
+                ? "font-medium text-amber-600"
                 : ""
           }
         >

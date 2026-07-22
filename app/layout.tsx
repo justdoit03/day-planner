@@ -1,10 +1,26 @@
 import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
+import { Manrope, Unbounded, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+// Body / UI — чистий сучасний гротеск з кирилицею
+const manrope = Manrope({
+  variable: "--font-sans",
+  subsets: ["latin", "cyrillic"],
+  weight: ["400", "500", "600", "700"],
+});
+
+// Display — характерний акцентний шрифт для заголовків і логотипу
+const unbounded = Unbounded({
+  variable: "--font-display",
+  subsets: ["latin", "cyrillic"],
+  weight: ["500", "600", "700"],
+});
+
+// Mono — цифри часу у стрічці дня («альманах»)
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
+  subsets: ["latin", "cyrillic"],
+  weight: ["500", "600"],
 });
 
 export const metadata: Metadata = {
@@ -34,7 +50,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0b0c10",
+  themeColor: "#eceef1",
 };
 
 export default function RootLayout({
@@ -43,7 +59,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="uk" className={`${geistSans.variable} h-full antialiased`}>
+    <html
+      lang="uk"
+      className={`${manrope.variable} ${unbounded.variable} ${jetbrainsMono.variable} h-full antialiased`}
+    >
       <body className="min-h-full">{children}</body>
     </html>
   );

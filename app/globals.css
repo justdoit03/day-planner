@@ -1,14 +1,20 @@
 @import "tailwindcss";
 
+/* ============================================================
+   «Хронологія» — світлий альманах.
+   День — це вертикальна лінія часу. Прохолодний папір, чорнило,
+   один теплий акцент (вермільйон) лише для «зараз» / жаби / дій.
+   Свідомо однотемна (світла) — це частина характеру продукту.
+   ============================================================ */
 :root {
-  --background: #0a0b0f;
-  --surface: #14161d;
-  --surface-2: #1e212b;
-  --foreground: #f4f5f7;
-  --muted: #888e9c;
-  --accent: #6c6af5; /* фирменный индиго — кнопки, активные состояния */
-  --danger: #f0524b; /* красный — высокий приоритет и ошибки */
-  --border: #262a35;
+  --background: #eceef1; /* прохолодний папір */
+  --surface: #ffffff; /* картки */
+  --surface-2: #f2f4f6; /* поля вводу / вторинне */
+  --foreground: #16181d; /* чорнило */
+  --muted: #6b7079; /* сірий текст */
+  --accent: #e0402a; /* вермільйон — «зараз», жаба, головні дії */
+  --danger: #e0402a; /* прострочено / помилки (той самий теплий) */
+  --border: #dce0e6; /* волосяна лінія */
 }
 
 @theme inline {
@@ -20,11 +26,13 @@
   --color-accent: var(--accent);
   --color-danger: var(--danger);
   --color-border: var(--border);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
@@ -32,18 +40,21 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
-  /* Тонкая премиальная подсветка сверху фирменным цветом */
-  background-image: radial-gradient(
-    90% 55% at 50% -12%,
-    rgba(108, 106, 245, 0.12),
-    transparent 68%
-  );
-  background-attachment: fixed;
 }
 
 /* Убираем синюю подсветку при тапе на мобильных */
 * {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Заголовки-«вивіска» — характерний display-шрифт */
+.font-display {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+}
+/* Моноширинні цифри часу у стрічці дня */
+.font-mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-feature-settings: "tnum";
 }
 
 /* Плавное появление экрана при переключении вкладок */

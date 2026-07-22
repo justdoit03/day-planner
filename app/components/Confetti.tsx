@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 // Лёгкое конфетти без библиотек — несколько падающих цветных кусочков.
-const COLORS = ["#6c6af5", "#f0524b", "#f5b445", "#34d399", "#f472b6", "#f4f5f7"];
+const COLORS = ["#e0402a", "#16181d", "#d98a2b", "#2e9c8e", "#3b5bdb", "#e07ba0"];
 
 type Piece = {
   left: number;

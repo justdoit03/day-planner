@@ -42,7 +42,7 @@ function TaskRow({
   onToggle: (id: string) => void;
 }) {
   return (
-    <li className="flex items-start gap-3 rounded-2xl border border-white/[0.05] bg-surface px-4 py-3">
+    <li className="flex items-start gap-3 rounded-xl border border-border bg-surface px-4 py-3 shadow-sm">
       <button
         type="button"
         onClick={() => onToggle(task.id)}
@@ -104,7 +104,9 @@ export default function WeekScreen({
 
   return (
     <section className="flex flex-1 flex-col px-5 pt-8">
-      <h1 className="text-2xl font-semibold tracking-tight">Тиждень</h1>
+      <h1 className="font-display text-2xl font-semibold tracking-tight">
+        Тиждень
+      </h1>
       <p className="mt-1 text-sm text-muted">
         {scheduledCount === 0
           ? "Найближчі 7 днів — задачі з дедлайнами зʼявляться тут"
@@ -151,7 +153,7 @@ export default function WeekScreen({
                 )}
               </div>
               {d.items.length === 0 ? (
-                <p className="rounded-2xl border border-dashed border-white/[0.06] px-4 py-3 text-xs text-muted/50">
+                <p className="rounded-xl border border-dashed border-border px-4 py-3 text-xs text-muted/60">
                   Вільно
                 </p>
               ) : (

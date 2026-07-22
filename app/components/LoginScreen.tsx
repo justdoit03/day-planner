@@ -35,20 +35,22 @@ export default function LoginScreen() {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-6">
       <div className="mb-10 text-center">
-        {/* Мини-логотип */}
-        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-[20px] bg-gradient-to-br from-[#8280ff] to-[#5a57e6] shadow-lg shadow-accent/30">
+        {/* Знак — вермільйоновий кахель із блискавкою */}
+        <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-[18px] bg-accent shadow-[0_12px_28px_-10px] shadow-accent/50">
           <svg width="30" height="30" viewBox="0 0 512 512" fill="none">
             <path d="M292 84 152 300h86l-22 128 168-212h-92z" fill="#fff" />
           </svg>
         </div>
-        <h1 className="text-4xl font-semibold tracking-tight">Ясно</h1>
+        <h1 className="font-display text-[38px] font-semibold tracking-tight">
+          Ясно
+        </h1>
         <p className="mt-2 text-sm text-muted">
           Скажи, що в голові — стане ясно, що робити
         </p>
       </div>
 
       {error && (
-        <p className="mb-3 rounded-xl bg-danger/15 px-4 py-2 text-center text-sm text-danger">
+        <p className="mb-3 rounded-xl bg-danger/10 px-4 py-2 text-center text-sm text-danger">
           {error}
         </p>
       )}
@@ -57,7 +59,7 @@ export default function LoginScreen() {
         type="button"
         onClick={signInGoogle}
         disabled={loading}
-        className="flex h-14 w-full items-center justify-center gap-3 rounded-2xl bg-white text-base font-semibold text-zinc-900 transition-all active:scale-[0.98] disabled:opacity-70"
+        className="flex h-14 w-full items-center justify-center gap-3 rounded-xl border border-border bg-surface text-base font-semibold text-foreground shadow-sm transition-all active:scale-[0.98] disabled:opacity-70"
       >
         {loading ? (
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-400 border-t-zinc-900" />

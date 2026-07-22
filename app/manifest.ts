@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "Скажи, що в голові — AI розкладе все по поличках і збере план на сьогодні",
     start_url: "/",
     display: "standalone",
-    background_color: "#0a0b0f",
-    theme_color: "#0a0b0f",
+    background_color: "#eceef1",
+    theme_color: "#eceef1",
     icons: [
       { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
       {

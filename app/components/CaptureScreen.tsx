@@ -37,7 +37,7 @@ function AiSkeleton() {
         {[0, 1, 2].map((i) => (
           <div
             key={i}
-            className="animate-pulse rounded-2xl border border-white/[0.05] bg-surface px-4 py-4"
+            className="animate-pulse rounded-xl border border-border bg-surface px-4 py-4 shadow-sm"
             style={{ animationDelay: `${i * 0.18}s` }}
           >
             <div className="flex items-center gap-3">
@@ -126,7 +126,9 @@ export default function CaptureScreen({
           {greeting()}, <span className="text-foreground">{name}</span> 👋
         </p>
       ) : null}
-      <h1 className="text-2xl font-semibold tracking-tight">Що в голові?</h1>
+      <h1 className="font-display text-2xl font-semibold tracking-tight">
+        Що в голові?
+      </h1>
       <p className="mt-1 text-sm text-muted">
         Скажи або напиши — AI розбере на задачі та збере план на сьогодні
       </p>
@@ -145,7 +147,7 @@ export default function CaptureScreen({
             <button
               type="button"
               onClick={() => setText(EXAMPLE_DUMP)}
-              className="mb-3 self-start rounded-full border border-white/[0.07] bg-surface px-4 py-2 text-sm text-muted transition-colors active:bg-surface-2 active:text-foreground"
+              className="mb-3 self-start rounded-full border border-border bg-surface px-4 py-2 text-sm text-muted shadow-sm transition-colors active:bg-surface-2 active:text-foreground"
             >
               ✨ Спробувати з прикладом
             </button>
@@ -154,7 +156,7 @@ export default function CaptureScreen({
       )}
 
       {(error || speech.error) && (
-        <p className="mb-2 rounded-xl bg-danger/15 px-4 py-2 text-sm text-danger">
+        <p className="mb-2 rounded-xl bg-danger/10 px-4 py-2 text-sm text-danger">
           {error || speech.error}
         </p>
       )}
@@ -164,15 +166,15 @@ export default function CaptureScreen({
           type="button"
           onClick={handleSend}
           disabled={!canSend}
-          className={`flex h-14 w-full items-center justify-center gap-2 rounded-2xl text-base font-semibold transition-all ${
+          className={`flex h-14 w-full items-center justify-center gap-2 rounded-xl text-base font-semibold transition-all ${
             canSend || loading
-              ? "bg-accent text-white shadow-lg shadow-accent/25 active:scale-[0.98]"
-              : "bg-surface-2 text-muted"
+              ? "bg-foreground text-background shadow-sm active:scale-[0.98]"
+              : "border border-border bg-surface-2 text-muted"
           }`}
         >
           {loading ? (
             <>
-              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-background/40 border-t-background" />
               Розбираю…
             </>
           ) : (

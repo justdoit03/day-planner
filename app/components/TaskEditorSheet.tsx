@@ -65,10 +65,10 @@ export default function TaskEditorSheet({
         className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"
       />
 
-      <div className="animate-fade-in relative z-10 w-full max-w-md rounded-t-3xl border border-white/[0.06] bg-surface px-6 pb-8 pt-3">
-        <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-white/15" />
+      <div className="animate-fade-in relative z-10 w-full max-w-md rounded-t-3xl border border-border bg-surface px-6 pb-8 pt-3 shadow-2xl">
+        <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-border" />
 
-        <h2 className="text-lg font-semibold">
+        <h2 className="font-display text-lg font-semibold">
           {task ? "Редагувати задачу" : "Нова задача"}
         </h2>
 
@@ -78,7 +78,7 @@ export default function TaskEditorSheet({
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Що треба зробити?"
           autoFocus={!task}
-          className="h-12 w-full rounded-xl border border-white/[0.05] bg-surface-2 px-4 text-base placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/40"
+          className="h-12 w-full rounded-xl border border-border bg-surface-2 px-4 text-base placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/40"
         />
 
         <label className="mb-1.5 mt-4 block text-xs text-muted">Пріоритет</label>
@@ -91,7 +91,7 @@ export default function TaskEditorSheet({
               className={`h-11 rounded-xl text-sm font-medium transition-colors ${
                 priority === p.value
                   ? "bg-accent/20 text-foreground ring-1 ring-accent/50"
-                  : "border border-white/[0.05] bg-surface-2 text-muted"
+                  : "border border-border bg-surface-2 text-muted"
               }`}
             >
               {p.label}
@@ -106,7 +106,7 @@ export default function TaskEditorSheet({
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
-              className="h-12 w-full rounded-xl border border-white/[0.05] bg-surface-2 px-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 [color-scheme:dark]"
+              className="h-12 w-full rounded-xl border border-border bg-surface-2 px-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 [color-scheme:light]"
             />
           </div>
           <div>
@@ -115,7 +115,7 @@ export default function TaskEditorSheet({
               type="time"
               value={dueTime}
               onChange={(e) => setDueTime(e.target.value)}
-              className="h-12 w-full rounded-xl border border-white/[0.05] bg-surface-2 px-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 [color-scheme:dark]"
+              className="h-12 w-full rounded-xl border border-border bg-surface-2 px-3 text-base text-foreground focus:outline-none focus:ring-2 focus:ring-accent/40 [color-scheme:light]"
             />
           </div>
         </div>
@@ -129,19 +129,19 @@ export default function TaskEditorSheet({
             onChange={(e) => setEstimate(e.target.value.replace(/\D/g, ""))}
             inputMode="numeric"
             placeholder="30"
-            className="h-12 w-full rounded-xl border border-white/[0.05] bg-surface-2 px-4 text-base placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/40"
+            className="h-12 w-full rounded-xl border border-border bg-surface-2 px-4 text-base placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/40"
           />
         </div>
 
         <button
           type="button"
           onClick={() => setToday(!today)}
-          className="mt-4 flex w-full items-center justify-between rounded-xl border border-white/[0.05] bg-surface-2 px-4 py-3.5"
+          className="mt-4 flex w-full items-center justify-between rounded-xl border border-border bg-surface-2 px-4 py-3.5"
         >
           <span className="text-sm">☀️ У план на сьогодні</span>
           <span
             className={`flex h-6 w-11 items-center rounded-full p-0.5 transition-colors ${
-              today ? "bg-accent" : "bg-white/10"
+              today ? "bg-accent" : "bg-zinc-300"
             }`}
           >
             <span
@@ -156,7 +156,7 @@ export default function TaskEditorSheet({
           <button
             type="button"
             onClick={onClose}
-            className="h-13 flex-1 rounded-2xl border border-white/[0.06] py-3.5 text-sm font-medium text-muted active:bg-surface-2"
+            className="h-13 flex-1 rounded-xl border border-border py-3.5 text-sm font-medium text-muted active:bg-surface-2"
           >
             Скасувати
           </button>
@@ -164,9 +164,9 @@ export default function TaskEditorSheet({
             type="button"
             onClick={save}
             disabled={!canSave}
-            className={`flex-1 rounded-2xl py-3.5 text-sm font-semibold transition-all ${
+            className={`flex-1 rounded-xl py-3.5 text-sm font-semibold transition-all ${
               canSave
-                ? "bg-accent text-white shadow-lg shadow-accent/25 active:scale-[0.98]"
+                ? "bg-foreground text-background shadow-sm active:scale-[0.98]"
                 : "bg-surface-2 text-muted"
             }`}
           >

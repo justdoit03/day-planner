@@ -15,7 +15,7 @@ export default function Onboarding({
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-6">
       <div className="mb-8 text-center">
         <div className="mb-4 text-5xl">👋</div>
-        <h1 className="text-[28px] font-semibold leading-tight tracking-tight">
+        <h1 className="font-display text-[26px] font-semibold leading-tight tracking-tight">
           В голові — каша?
         </h1>
         <p className="mt-1.5 text-[17px] font-medium text-foreground/90">
@@ -33,13 +33,13 @@ export default function Onboarding({
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Ім'я"
-        className="h-14 w-full rounded-2xl border border-white/[0.05] bg-surface px-5 text-base placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/40"
+        className="h-14 w-full rounded-xl border border-border bg-surface px-5 text-base shadow-sm placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/40"
       />
 
       <button
         type="button"
         onClick={() => onDone(name.trim())}
-        className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-base font-semibold text-white shadow-lg shadow-accent/25 transition-transform active:scale-[0.98]"
+        className="mt-4 flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-foreground text-base font-semibold text-background shadow-sm transition-transform active:scale-[0.98]"
       >
         Поїхали 🚀
       </button>

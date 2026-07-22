@@ -96,7 +96,7 @@ function SwipeRow({
     <li className="relative overflow-hidden rounded-2xl">
       <div className="pointer-events-none absolute inset-0 flex items-center justify-between px-5">
         <span
-          className="flex items-center gap-1.5 text-sm font-semibold text-accent"
+          className="flex items-center gap-1.5 text-sm font-semibold text-emerald-600"
           style={{ opacity: rightHint }}
         >
           <IconCheck /> Виконати
@@ -148,7 +148,7 @@ function TaskRow({
       onSwipeRight={() => onToggle(task.id)}
       onSwipeLeft={() => onDelete(task.id)}
     >
-      <div className="flex items-start gap-3 rounded-2xl border border-white/[0.05] bg-surface px-4 py-3.5">
+      <div className="flex items-start gap-3 rounded-xl border border-border bg-surface px-4 py-3.5 shadow-sm">
         <button
           type="button"
           onClick={() => onToggle(task.id)}
@@ -184,7 +184,7 @@ function TaskRow({
             aria-label={task.today ? "Прибрати з сьогодні" : "У план на сьогодні"}
             className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${
               task.today
-                ? "bg-amber-400/20 text-amber-400"
+                ? "bg-amber-500/15 text-amber-600"
                 : "text-muted active:bg-surface-2"
             }`}
           >
@@ -260,7 +260,9 @@ export default function InboxScreen({
     <section className="flex flex-1 flex-col px-5 pt-8">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Вхідні</h1>
+          <h1 className="font-display text-2xl font-semibold tracking-tight">
+            Вхідні
+          </h1>
           <p className="mt-1 text-sm text-muted">
             {tasks.length === 0
               ? "Сюди потраплять задачі з твоїх думок"
@@ -281,8 +283,8 @@ export default function InboxScreen({
             }}
             className={`mt-1 shrink-0 rounded-full px-3.5 py-2 text-xs font-medium transition-colors ${
               confirmClear
-                ? "bg-danger/20 text-danger"
-                : "border border-white/[0.07] text-muted active:bg-surface"
+                ? "bg-danger/15 text-danger"
+                : "border border-border text-muted active:bg-surface-2"
             }`}
           >
             {confirmClear ? `Видалити ${doneCount}?` : "🧹 Очистити виконані"}
@@ -299,7 +301,7 @@ export default function InboxScreen({
           <button
             type="button"
             onClick={onAdd}
-            className="mt-2 rounded-full border border-white/[0.07] bg-surface px-4 py-2 text-sm text-muted transition-colors active:bg-surface-2 active:text-foreground"
+            className="mt-2 rounded-full border border-border bg-surface px-4 py-2 text-sm text-muted shadow-sm transition-colors active:bg-surface-2 active:text-foreground"
           >
             ➕ Додати задачу вручну
           </button>
@@ -328,7 +330,7 @@ export default function InboxScreen({
         <button
           type="button"
           onClick={onAdd}
-          className="mb-6 flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-white/[0.12] text-sm text-muted transition-colors active:bg-surface active:text-foreground"
+          className="mb-6 flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border text-sm text-muted transition-colors active:bg-surface active:text-foreground"
         >
           ➕ Додати задачу
         </button>

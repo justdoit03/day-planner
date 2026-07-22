@@ -51,8 +51,8 @@ export default function ProfileSheet({
       />
 
       {/* шит */}
-      <div className="animate-fade-in relative z-10 w-full max-w-md rounded-t-3xl border border-white/[0.06] bg-surface px-6 pb-8 pt-3">
-        <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-white/15" />
+      <div className="animate-fade-in relative z-10 w-full max-w-md rounded-t-3xl border border-border bg-surface px-6 pb-8 pt-3">
+        <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-border" />
 
         {/* хто я */}
         <div className="flex items-center gap-4">
@@ -61,7 +61,7 @@ export default function ProfileSheet({
             <img
               src={avatarUrl}
               alt=""
-              className="h-14 w-14 rounded-full border border-white/10"
+              className="h-14 w-14 rounded-full border border-border"
               referrerPolicy="no-referrer"
             />
           ) : (
@@ -84,7 +84,7 @@ export default function ProfileSheet({
           ].map((s) => (
             <div
               key={s.label}
-              className="rounded-2xl border border-white/[0.05] bg-surface-2 px-3 py-3 text-center"
+              className="rounded-2xl border border-border bg-surface-2 px-3 py-3 text-center"
             >
               <div className="text-xl font-semibold">{s.n}</div>
               <div className="mt-0.5 text-xs text-muted">{s.label}</div>
@@ -101,7 +101,7 @@ export default function ProfileSheet({
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             placeholder="Ім'я"
-            className="h-12 min-w-0 flex-1 rounded-xl border border-white/[0.05] bg-surface-2 px-4 text-base placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/40"
+            className="h-12 min-w-0 flex-1 rounded-xl border border-border bg-surface-2 px-4 text-base placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/40"
           />
           <button
             type="button"
@@ -109,7 +109,7 @@ export default function ProfileSheet({
             disabled={!dirty}
             className={`h-12 shrink-0 rounded-xl px-4 text-sm font-semibold transition-all ${
               dirty
-                ? "bg-accent text-white active:scale-[0.97]"
+                ? "bg-foreground text-background active:scale-[0.97]"
                 : "bg-surface-2 text-muted"
             }`}
           >
@@ -121,7 +121,7 @@ export default function ProfileSheet({
         <button
           type="button"
           onClick={onSignOut}
-          className="mt-6 h-12 w-full rounded-xl border border-white/[0.06] text-sm font-medium text-muted transition-colors active:bg-surface-2 active:text-foreground"
+          className="mt-6 h-12 w-full rounded-xl border border-border text-sm font-medium text-muted transition-colors active:bg-surface-2 active:text-foreground"
         >
           Вийти з акаунта
         </button>

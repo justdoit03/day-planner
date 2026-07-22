@@ -143,7 +143,7 @@ export default function TodayScreen({
         <section className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
           <Confetti />
           <div className="text-6xl">🎉</div>
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1 className="font-display text-2xl font-semibold tracking-tight">
             План на день виконано!
           </h1>
           <p className="max-w-xs text-sm text-muted">
@@ -153,7 +153,7 @@ export default function TodayScreen({
           <button
             type="button"
             onClick={() => setFocus(false)}
-            className="mt-2 h-12 rounded-2xl bg-accent px-8 text-base font-semibold text-white shadow-lg shadow-accent/25 active:scale-[0.98]"
+            className="mt-2 h-12 rounded-xl bg-foreground px-8 text-base font-semibold text-background shadow-sm active:scale-[0.98]"
           >
             Готово
           </button>
@@ -195,7 +195,9 @@ export default function TodayScreen({
         )}
 
         <div className="mb-1 text-3xl">{info.emoji}</div>
-        <h1 className="text-2xl font-semibold tracking-tight">{info.label}</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight">
+          {info.label}
+        </h1>
         <p className="mt-1 text-sm text-muted">
           Розбери цей блок — залишилось {items.length}
         </p>
@@ -206,7 +208,7 @@ export default function TodayScreen({
               <button
                 type="button"
                 onClick={() => onToggle(task.id)}
-                className="flex w-full items-start gap-3 rounded-2xl border border-white/[0.05] bg-surface px-4 py-4 text-left transition-transform active:scale-[0.99]"
+                className="flex w-full items-start gap-3 rounded-xl border border-border bg-surface px-4 py-4 text-left shadow-sm transition-transform active:scale-[0.99]"
               >
                 <Checkbox done={false} />
                 <div className="min-w-0 flex-1">
@@ -244,7 +246,9 @@ export default function TodayScreen({
 
   return (
     <section className="flex flex-1 flex-col px-5 pt-8">
-      <h1 className="text-2xl font-semibold tracking-tight">Сьогодні</h1>
+      <h1 className="font-display text-2xl font-semibold tracking-tight">
+        Сьогодні
+      </h1>
       <p className="mt-1 text-sm capitalize text-muted">
         {today}
         {total > 0 && (
@@ -257,7 +261,7 @@ export default function TodayScreen({
 
       {/* Розумний ранок: задачи с дедлайном на сегодня/просроченные, ещё не в плане */}
       {dueSuggestCount > 0 && (
-        <div className="mt-5 flex items-center gap-3 rounded-2xl border border-amber-400/25 bg-amber-400/[0.08] px-4 py-3.5">
+        <div className="mt-5 flex items-center gap-3 rounded-xl border border-amber-500/30 bg-amber-500/[0.09] px-4 py-3.5">
           <span className="text-xl leading-none">🌅</span>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium">Розумний ранок</p>
@@ -269,7 +273,7 @@ export default function TodayScreen({
           <button
             type="button"
             onClick={onPlanDueToday}
-            className="shrink-0 rounded-full bg-amber-400/20 px-4 py-2 text-xs font-semibold text-amber-400 transition-transform active:scale-95"
+            className="shrink-0 rounded-full bg-amber-500/15 px-4 py-2 text-xs font-semibold text-amber-700 transition-transform active:scale-95"
           >
             Додати
           </button>
@@ -343,7 +347,7 @@ export default function TodayScreen({
 
           {/* ⚖️ 1-3-5: підказка про перевантаження (AI радить, вирішуєш ти) */}
           {overloaded && (
-            <div className="mt-3 flex items-start gap-3 rounded-2xl border border-amber-400/20 bg-amber-400/[0.06] px-4 py-3">
+            <div className="mt-3 flex items-start gap-3 rounded-xl border border-amber-500/25 bg-amber-500/[0.08] px-4 py-3">
               <span className="text-base leading-none">⚖️</span>
               <p className="text-xs leading-relaxed text-muted">
                 План амбітний — {undone.length} задач. Правило{" "}
@@ -357,7 +361,7 @@ export default function TodayScreen({
           <button
             type="button"
             onClick={() => setFocus(true)}
-            className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-accent text-base font-semibold text-white shadow-lg shadow-accent/25 transition-transform active:scale-[0.98]"
+            className="mt-5 flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-foreground text-base font-semibold text-background shadow-sm transition-transform active:scale-[0.98]"
           >
             <IconBolt />
             Фокус — веди мене по плану
@@ -452,15 +456,15 @@ function TimelineRow({
 }) {
   return (
     <li className="flex gap-3">
-      <span className="w-11 shrink-0 pt-3.5 text-right text-xs font-semibold text-accent">
+      <span className="font-mono w-11 shrink-0 pt-3.5 text-right text-xs font-semibold text-foreground">
         {task.dueTime}
       </span>
-      <div className="relative flex-1 border-l-2 border-white/[0.06] pb-2 pl-4">
-        <span className="absolute -left-[5px] top-4 h-2 w-2 rounded-full bg-accent" />
+      <div className="relative flex-1 border-l-2 border-border pb-2 pl-4">
+        <span className="absolute -left-[5px] top-4 h-2 w-2 rounded-full bg-zinc-300" />
         <button
           type="button"
           onClick={() => onToggle(task.id)}
-          className="flex w-full items-start gap-3 rounded-2xl border border-white/[0.05] bg-surface px-4 py-3 text-left transition-transform active:scale-[0.99]"
+          className="flex w-full items-start gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-left shadow-sm transition-transform active:scale-[0.99]"
         >
           <Checkbox done={task.done} />
           <div className="min-w-0 flex-1">
@@ -481,7 +485,7 @@ function TimelineRow({
 function NowMarker({ now }: { now: string }) {
   return (
     <li className="flex items-center gap-3 py-1.5">
-      <span className="w-11 shrink-0 text-right text-[11px] font-semibold text-danger">
+      <span className="font-mono w-11 shrink-0 text-right text-[11px] font-semibold text-danger">
         {now}
       </span>
       <div className="flex flex-1 items-center gap-2 pl-4">
@@ -505,7 +509,7 @@ function TaskRow({
   onToggleToday: (id: string) => void;
 }) {
   return (
-    <li className="flex items-start gap-3 rounded-2xl border border-white/[0.05] bg-surface px-4 py-3.5">
+    <li className="flex items-start gap-3 rounded-xl border border-border bg-surface px-4 py-3.5 shadow-sm">
       <button
         type="button"
         onClick={() => onToggle(task.id)}

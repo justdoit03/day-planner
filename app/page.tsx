@@ -148,7 +148,7 @@ export default function Home() {
           <img
             src={session.user.user_metadata.avatar_url as string}
             alt=""
-            className="h-9 w-9 rounded-full border border-white/15"
+            className="h-9 w-9 rounded-full border border-border"
             referrerPolicy="no-referrer"
           />
         ) : (
@@ -208,12 +208,12 @@ export default function Home() {
       />
 
       {pendingDelete && (
-        <div className="animate-fade-in fixed bottom-24 left-1/2 z-40 flex -translate-x-1/2 items-center gap-3 rounded-full border border-white/[0.08] bg-surface-2 py-2.5 pl-5 pr-2.5 shadow-xl">
+        <div className="animate-fade-in fixed bottom-24 left-1/2 z-40 flex -translate-x-1/2 items-center gap-3 rounded-full border border-border bg-foreground py-2.5 pl-5 pr-2.5 text-background shadow-xl">
           <span className="text-sm">Задачу видалено</span>
           <button
             type="button"
             onClick={undoDelete}
-            className="rounded-full bg-accent/20 px-3.5 py-1.5 text-sm font-semibold text-accent"
+            className="rounded-full bg-background/20 px-3.5 py-1.5 text-sm font-semibold text-background"
           >
             Повернути
           </button>
